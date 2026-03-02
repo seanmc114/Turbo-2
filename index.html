@@ -24,6 +24,28 @@
     <!-- Game Section -->
     <div id="game" style="display: none;">
       <div id="timer">Time: 0s</div>
+
+      <!-- Accessibility + SFX controls (does not change gameplay) -->
+      <div id="a11y-bar" class="a11yBar" aria-label="Accessibility controls">
+        <button id="read-all" class="a11yBtn" type="button" title="Read all questions">🔊 Read</button>
+        <button id="stop-reading" class="a11yBtn" type="button" title="Stop reading">⏹ Stop</button>
+        <span class="a11yToggle">
+          <input id="sound-toggle" type="checkbox" checked />
+          <label for="sound-toggle">Sounds</label>
+        </span>
+        <span class="a11yToggle">
+          <input id="voice-toggle" type="checkbox" checked />
+          <label for="voice-toggle">Voice</label>
+        </span>
+        <span class="a11yToggle">
+          <input id="arcade-toggle" type="checkbox" checked />
+          <label for="arcade-toggle">Arcade FX</label>
+        </span>
+        <span class="a11yToggle">
+          <input id="startvoice-toggle" type="checkbox" checked />
+          <label for="startvoice-toggle">Start Voice</label>
+        </span>
+      </div>
       <div id="questions"></div>
       <button id="submit">Check Answers</button>
       <div id="results"></div>
