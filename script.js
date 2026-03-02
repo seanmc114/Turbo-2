@@ -704,7 +704,7 @@ function stopTimer() {
   clearInterval(timerInterval);
 }
 
-document.getElementById("submit").addEventListener("click", (e) => {
+function checkAnswers(e){
   if (e) e.preventDefault();
   stopSpeaking();
   stopTimer();
@@ -736,7 +736,14 @@ document.getElementById("submit").addEventListener("click", (e) => {
       input.style.border = "2px solid red";
       if (soundEnabled()) sfxWrong();
     }
-  });
+  
+}
+
+// Robust binding (in case something prevents the listener from attaching)
+try {
+  const btn = document.getElementById("submit");
+  if (btn) btn.addEventListener("click", checkAnswers);
+} catch (err) { console.warn(err); }
 
   const totalTime = elapsed + penalty;
   resultsContainer.innerHTML = `<h3>Game Over!</h3><p>Correct: ${correct}/10</p><p>Time: ${elapsed}s + Penalty: ${penalty}s = <strong>${totalTime}s</strong></p><h4>Feedback:</h4>`;
