@@ -34,13 +34,27 @@ body::before {
   max-width: 600px;
   padding: 30px;
   /* more translucent so crest shows through */
-  background-color: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.78);
+  /* frosted glass vibe */
+  backdrop-filter: blur(12px);
   border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.55);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   color: #333;
   position: relative;
   z-index: 1;
+}
+
+
+
+/* subtle glass shine */
+.container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: radial-gradient(circle at 20% 15%, rgba(255,255,255,0.75), rgba(255,255,255,0.0) 55%);
+  pointer-events: none;
 }
 
 h1 {
@@ -160,7 +174,7 @@ h1 span.turbo {
   margin: 12px 0;
   padding: 10px 12px;
   border-radius: 14px;
-  background: rgba(255,255,255,0.65);
+  background: rgba(255,255,255,0.80);
   box-shadow: 0 6px 16px rgba(0,0,0,0.08);
 }
 

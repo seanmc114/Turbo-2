@@ -704,7 +704,8 @@ function stopTimer() {
   clearInterval(timerInterval);
 }
 
-document.getElementById("submit").addEventListener("click", () => {
+document.getElementById("submit").addEventListener("click", (e) => {
+  if (e) e.preventDefault();
   stopSpeaking();
   stopTimer();
 
@@ -818,6 +819,9 @@ document.getElementById("submit").addEventListener("click", () => {
     renderLevels();
   };
   resultsContainer.appendChild(backButton);
+
+  // Make it obvious something happened
+  resultsContainer.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 function levelUnlockTime(level) {
