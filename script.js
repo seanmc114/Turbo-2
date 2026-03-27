@@ -1,1726 +1,758 @@
+const MAX_TURNS = 3;
+const TOTAL_STARS_KEY = "oral_totalStars";
 
-// Turbo Spanish Verb Game (keeps gameplay rules; updated verb set + optional SFX/Voice)
-
-const VERB_SETS = {
-  Present: [
-    { en: "I want", es: "quiero" },
-    { en: "I do not want", es: "no quiero" },
-    { en: "Do I want?", es: "quiero?" },
-    { en: "You want", es: "quieres" },
-    { en: "You do not want", es: "no quieres" },
-    { en: "Do you want?", es: "quieres?" },
-    { en: "He wants", es: "quiere" },
-    { en: "He does not want", es: "no quiere" },
-    { en: "Does he want?", es: "quiere?" },
-    { en: "She wants", es: "quiere" },
-    { en: "She does not want", es: "no quiere" },
-    { en: "Does she want?", es: "quiere?" },
-    { en: "We want", es: "queremos" },
-    { en: "We do not want", es: "no queremos" },
-    { en: "Do we want?", es: "queremos?" },
-    { en: "They want", es: "quieren" },
-    { en: "They do not want", es: "no quieren" },
-    { en: "Do they want?", es: "quieren?" },
-    { en: "I prepare", es: "preparo" },
-    { en: "I do not prepare", es: "no preparo" },
-    { en: "Do I prepare?", es: "preparo?" },
-    { en: "You prepare", es: "preparas" },
-    { en: "You do not prepare", es: "no preparas" },
-    { en: "Do you prepare?", es: "preparas?" },
-    { en: "He prepares", es: "prepara" },
-    { en: "He does not prepare", es: "no prepara" },
-    { en: "Does he prepare?", es: "prepara?" },
-    { en: "She prepares", es: "prepara" },
-    { en: "She does not prepare", es: "no prepara" },
-    { en: "Does she prepare?", es: "prepara?" },
-    { en: "We prepare", es: "preparamos" },
-    { en: "We do not prepare", es: "no preparamos" },
-    { en: "Do we prepare?", es: "preparamos?" },
-    { en: "They prepare", es: "preparan" },
-    { en: "They do not prepare", es: "no preparan" },
-    { en: "Do they prepare?", es: "preparan?" },
-    { en: "I drink", es: "bebo" },
-    { en: "I do not drink", es: "no bebo" },
-    { en: "Do I drink?", es: "bebo?" },
-    { en: "You drink", es: "bebes" },
-    { en: "You do not drink", es: "no bebes" },
-    { en: "Do you drink?", es: "bebes?" },
-    { en: "He drinks", es: "bebe" },
-    { en: "He does not drink", es: "no bebe" },
-    { en: "Does he drink?", es: "bebe?" },
-    { en: "She drinks", es: "bebe" },
-    { en: "She does not drink", es: "no bebe" },
-    { en: "Does she drink?", es: "bebe?" },
-    { en: "We drink", es: "bebemos" },
-    { en: "We do not drink", es: "no bebemos" },
-    { en: "Do we drink?", es: "bebemos?" },
-    { en: "They drink", es: "beben" },
-    { en: "They do not drink", es: "no beben" },
-    { en: "Do they drink?", es: "beben?" },
-    { en: "I eat", es: "como" },
-    { en: "I do not eat", es: "no como" },
-    { en: "Do I eat?", es: "como?" },
-    { en: "You eat", es: "comes" },
-    { en: "You do not eat", es: "no comes" },
-    { en: "Do you eat?", es: "comes?" },
-    { en: "He eats", es: "come" },
-    { en: "He does not eat", es: "no come" },
-    { en: "Does he eat?", es: "come?" },
-    { en: "She eats", es: "come" },
-    { en: "She does not eat", es: "no come" },
-    { en: "Does she eat?", es: "come?" },
-    { en: "We eat", es: "comemos" },
-    { en: "We do not eat", es: "no comemos" },
-    { en: "Do we eat?", es: "comemos?" },
-    { en: "They eat", es: "comen" },
-    { en: "They do not eat", es: "no comen" },
-    { en: "Do they eat?", es: "comen?" },
-    { en: "I write", es: "escribo" },
-    { en: "I do not write", es: "no escribo" },
-    { en: "Do I write?", es: "escribo?" },
-    { en: "You write", es: "escribes" },
-    { en: "You do not write", es: "no escribes" },
-    { en: "Do you write?", es: "escribes?" },
-    { en: "He writes", es: "escribe" },
-    { en: "He does not write", es: "no escribe" },
-    { en: "Does he write?", es: "escribe?" },
-    { en: "She writes", es: "escribe" },
-    { en: "She does not write", es: "no escribe" },
-    { en: "Does she write?", es: "escribe?" },
-    { en: "We write", es: "escribimos" },
-    { en: "We do not write", es: "no escribimos" },
-    { en: "Do we write?", es: "escribimos?" },
-    { en: "They write", es: "escriben" },
-    { en: "They do not write", es: "no escriben" },
-    { en: "Do they write?", es: "escriben?" },
-    { en: "I study", es: "estudio" },
-    { en: "I do not study", es: "no estudio" },
-    { en: "Do I study?", es: "estudio?" },
-    { en: "You study", es: "estudias" },
-    { en: "You do not study", es: "no estudias" },
-    { en: "Do you study?", es: "estudias?" },
-    { en: "He studies", es: "estudia" },
-    { en: "He does not study", es: "no estudia" },
-    { en: "Does he study?", es: "estudia?" },
-    { en: "She studies", es: "estudia" },
-    { en: "She does not study", es: "no estudia" },
-    { en: "Does she study?", es: "estudia?" },
-    { en: "We study", es: "estudiamos" },
-    { en: "We do not study", es: "no estudiamos" },
-    { en: "Do we study?", es: "estudiamos?" },
-    { en: "They study", es: "estudian" },
-    { en: "They do not study", es: "no estudian" },
-    { en: "Do they study?", es: "estudian?" },
-    { en: "I sing", es: "canto" },
-    { en: "I do not sing", es: "no canto" },
-    { en: "Do I sing?", es: "canto?" },
-    { en: "You sing", es: "cantas" },
-    { en: "You do not sing", es: "no cantas" },
-    { en: "Do you sing?", es: "cantas?" },
-    { en: "He sings", es: "canta" },
-    { en: "He does not sing", es: "no canta" },
-    { en: "Does he sing?", es: "canta?" },
-    { en: "She sings", es: "canta" },
-    { en: "She does not sing", es: "no canta" },
-    { en: "Does she sing?", es: "canta?" },
-    { en: "We sing", es: "cantamos" },
-    { en: "We do not sing", es: "no cantamos" },
-    { en: "Do we sing?", es: "cantamos?" },
-    { en: "They sing", es: "cantan" },
-    { en: "They do not sing", es: "no cantan" },
-    { en: "Do they sing?", es: "cantan?" },
-    { en: "I go", es: "voy" },
-    { en: "I do not go", es: "no voy" },
-    { en: "Do I go?", es: "voy?" },
-    { en: "You go", es: "vas" },
-    { en: "You do not go", es: "no vas" },
-    { en: "Do you go?", es: "vas?" },
-    { en: "He goes", es: "va" },
-    { en: "He does not go", es: "no va" },
-    { en: "Does he go?", es: "va?" },
-    { en: "She goes", es: "va" },
-    { en: "She does not go", es: "no va" },
-    { en: "Does she go?", es: "va?" },
-    { en: "We go", es: "vamos" },
-    { en: "We do not go", es: "no vamos" },
-    { en: "Do we go?", es: "vamos?" },
-    { en: "They go", es: "van" },
-    { en: "They do not go", es: "no van" },
-    { en: "Do they go?", es: "van?" },
-    { en: "I live", es: "vivo" },
-    { en: "I do not live", es: "no vivo" },
-    { en: "Do I live?", es: "vivo?" },
-    { en: "You live", es: "vives" },
-    { en: "You do not live", es: "no vives" },
-    { en: "Do you live?", es: "vives?" },
-    { en: "He lives", es: "vive" },
-    { en: "He does not live", es: "no vive" },
-    { en: "Does he live?", es: "vive?" },
-    { en: "She lives", es: "vive" },
-    { en: "She does not live", es: "no vive" },
-    { en: "Does she live?", es: "vive?" },
-    { en: "We live", es: "vivimos" },
-    { en: "We do not live", es: "no vivimos" },
-    { en: "Do we live?", es: "vivimos?" },
-    { en: "They live", es: "viven" },
-    { en: "They do not live", es: "no viven" },
-    { en: "Do they live?", es: "viven?" },
-    { en: "I have", es: "tengo" },
-    { en: "I do not have", es: "no tengo" },
-    { en: "Do I have?", es: "tengo?" },
-    { en: "You have", es: "tienes" },
-    { en: "You do not have", es: "no tienes" },
-    { en: "Do you have?", es: "tienes?" },
-    { en: "He has", es: "tiene" },
-    { en: "He does not have", es: "no tiene" },
-    { en: "Does he have?", es: "tiene?" },
-    { en: "She has", es: "tiene" },
-    { en: "She does not have", es: "no tiene" },
-    { en: "Does she have?", es: "tiene?" },
-    { en: "We have", es: "tenemos" },
-    { en: "We do not have", es: "no tenemos" },
-    { en: "Do we have?", es: "tenemos?" },
-    { en: "They have", es: "tienen" },
-    { en: "They do not have", es: "no tienen" },
-    { en: "Do they have?", es: "tienen?" },
-    { en: "I drive", es: "conduzco" },
-    { en: "I do not drive", es: "no conduzco" },
-    { en: "Do I drive?", es: "conduzco?" },
-    { en: "You drive", es: "conduces" },
-    { en: "You do not drive", es: "no conduces" },
-    { en: "Do you drive?", es: "conduces?" },
-    { en: "He drives", es: "conduce" },
-    { en: "He does not drive", es: "no conduce" },
-    { en: "Does he drive?", es: "conduce?" },
-    { en: "She drives", es: "conduce" },
-    { en: "She does not drive", es: "no conduce" },
-    { en: "Does she drive?", es: "conduce?" },
-    { en: "We drive", es: "conducimos" },
-    { en: "We do not drive", es: "no conducimos" },
-    { en: "Do we drive?", es: "conducimos?" },
-    { en: "They drive", es: "conducen" },
-    { en: "They do not drive", es: "no conducen" },
-    { en: "Do they drive?", es: "conducen?" },
-    { en: "I burn", es: "quemo" },
-    { en: "I do not burn", es: "no quemo" },
-    { en: "Do I burn?", es: "quemo?" },
-    { en: "You burn", es: "quemas" },
-    { en: "You do not burn", es: "no quemas" },
-    { en: "Do you burn?", es: "quemas?" },
-    { en: "He burns", es: "quema" },
-    { en: "He does not burn", es: "no quema" },
-    { en: "Does he burn?", es: "quema?" },
-    { en: "She burns", es: "quema" },
-    { en: "She does not burn", es: "no quema" },
-    { en: "Does she burn?", es: "quema?" },
-    { en: "We burn", es: "quemamos" },
-    { en: "We do not burn", es: "no quemamos" },
-    { en: "Do we burn?", es: "quemamos?" },
-    { en: "They burn", es: "queman" },
-    { en: "They do not burn", es: "no queman" },
-    { en: "Do they burn?", es: "queman?" },
-    { en: "I like", es: "me gusta" },
-    { en: "I do not like", es: "no me gusta" },
-    { en: "Do I like?", es: "me gusta?" },
-    { en: "You like", es: "te gusta" },
-    { en: "You do not like", es: "no te gusta" },
-    { en: "Do you like?", es: "te gusta?" },
-    { en: "He likes", es: "le gusta" },
-    { en: "He does not like", es: "no le gusta" },
-    { en: "Does he like?", es: "le gusta?" },
-    { en: "She likes", es: "le gusta" },
-    { en: "She does not like", es: "no le gusta" },
-    { en: "Does she like?", es: "le gusta?" },
-    { en: "We like", es: "nos gusta" },
-    { en: "We do not like", es: "no nos gusta" },
-    { en: "Do we like?", es: "nos gusta?" },
-    { en: "They like", es: "les gusta" },
-    { en: "They do not like", es: "no les gusta" },
-    { en: "Do they like?", es: "les gusta?" },
-    { en: "I love", es: "me encanta" },
-    { en: "I do not love", es: "no me encanta" },
-    { en: "Do I love?", es: "me encanta?" },
-    { en: "You love", es: "te encanta" },
-    { en: "You do not love", es: "no te encanta" },
-    { en: "Do you love?", es: "te encanta?" },
-    { en: "He loves", es: "le encanta" },
-    { en: "He does not love", es: "no le encanta" },
-    { en: "Does he love?", es: "le encanta?" },
-    { en: "She loves", es: "le encanta" },
-    { en: "She does not love", es: "no le encanta" },
-    { en: "Does she love?", es: "le encanta?" },
-    { en: "We love", es: "nos encanta" },
-    { en: "We do not love", es: "no nos encanta" },
-    { en: "Do we love?", es: "nos encanta?" },
-    { en: "They love", es: "les encanta" },
-    { en: "They do not love", es: "no les encanta" },
-    { en: "Do they love?", es: "les encanta?" },
-    { en: "I open", es: "abro" },
-    { en: "I do not open", es: "no abro" },
-    { en: "Do I open?", es: "abro?" },
-    { en: "You open", es: "abres" },
-    { en: "You do not open", es: "no abres" },
-    { en: "Do you open?", es: "abres?" },
-    { en: "He opens", es: "abre" },
-    { en: "He does not open", es: "no abre" },
-    { en: "Does he open?", es: "abre?" },
-    { en: "She opens", es: "abre" },
-    { en: "She does not open", es: "no abre" },
-    { en: "Does she open?", es: "abre?" },
-    { en: "We open", es: "abrimos" },
-    { en: "We do not open", es: "no abrimos" },
-    { en: "Do we open?", es: "abrimos?" },
-    { en: "They open", es: "abren" },
-    { en: "They do not open", es: "no abren" },
-    { en: "Do they open?", es: "abren?" },
-    { en: "I close", es: "cierro" },
-    { en: "I do not close", es: "no cierro" },
-    { en: "Do I close?", es: "cierro?" },
-    { en: "You close", es: "cierras" },
-    { en: "You do not close", es: "no cierras" },
-    { en: "Do you close?", es: "cierras?" },
-    { en: "He closes", es: "cierra" },
-    { en: "He does not close", es: "no cierra" },
-    { en: "Does he close?", es: "cierra?" },
-    { en: "She closes", es: "cierra" },
-    { en: "She does not close", es: "no cierra" },
-    { en: "Does she close?", es: "cierra?" },
-    { en: "We close", es: "cerramos" },
-    { en: "We do not close", es: "no cerramos" },
-    { en: "Do we close?", es: "cerramos?" },
-    { en: "They close", es: "cierran" },
-    { en: "They do not close", es: "no cierran" },
-    { en: "Do they close?", es: "cierran?" },
-    { en: "I play", es: "juego" },
-    { en: "I do not play", es: "no juego" },
-    { en: "Do I play?", es: "juego?" },
-    { en: "You play", es: "juegas" },
-    { en: "You do not play", es: "no juegas" },
-    { en: "Do you play?", es: "juegas?" },
-    { en: "He plays", es: "juega" },
-    { en: "He does not play", es: "no juega" },
-    { en: "Does he play?", es: "juega?" },
-    { en: "She plays", es: "juega" },
-    { en: "She does not play", es: "no juega" },
-    { en: "Does she play?", es: "juega?" },
-    { en: "We play", es: "jugamos" },
-    { en: "We do not play", es: "no jugamos" },
-    { en: "Do we play?", es: "jugamos?" },
-    { en: "They play", es: "juegan" },
-    { en: "They do not play", es: "no juegan" },
-    { en: "Do they play?", es: "juegan?" },
-    { en: "I swim", es: "nado" },
-    { en: "I do not swim", es: "no nado" },
-    { en: "Do I swim?", es: "nado?" },
-    { en: "You swim", es: "nadas" },
-    { en: "You do not swim", es: "no nadas" },
-    { en: "Do you swim?", es: "nadas?" },
-    { en: "He swims", es: "nada" },
-    { en: "He does not swim", es: "no nada" },
-    { en: "Does he swim?", es: "nada?" },
-    { en: "She swims", es: "nada" },
-    { en: "She does not swim", es: "no nada" },
-    { en: "Does she swim?", es: "nada?" },
-    { en: "We swim", es: "nadamos" },
-    { en: "We do not swim", es: "no nadamos" },
-    { en: "Do we swim?", es: "nadamos?" },
-    { en: "They swim", es: "nadan" },
-    { en: "They do not swim", es: "no nadan" },
-    { en: "Do they swim?", es: "nadan?" },
-    { en: "I draw", es: "dibujo" },
-    { en: "I do not draw", es: "no dibujo" },
-    { en: "Do I draw?", es: "dibujo?" },
-    { en: "You draw", es: "dibujas" },
-    { en: "You do not draw", es: "no dibujas" },
-    { en: "Do you draw?", es: "dibujas?" },
-    { en: "He draws", es: "dibuja" },
-    { en: "He does not draw", es: "no dibuja" },
-    { en: "Does he draw?", es: "dibuja?" },
-    { en: "She draws", es: "dibuja" },
-    { en: "She does not draw", es: "no dibuja" },
-    { en: "Does she draw?", es: "dibuja?" },
-    { en: "We draw", es: "dibujamos" },
-    { en: "We do not draw", es: "no dibujamos" },
-    { en: "Do we draw?", es: "dibujamos?" },
-    { en: "They draw", es: "dibujan" },
-    { en: "They do not draw", es: "no dibujan" },
-    { en: "Do they draw?", es: "dibujan?" },
-    { en: "I wash", es: "lavo" },
-    { en: "I do not wash", es: "no lavo" },
-    { en: "Do I wash?", es: "lavo?" },
-    { en: "You wash", es: "lavas" },
-    { en: "You do not wash", es: "no lavas" },
-    { en: "Do you wash?", es: "lavas?" },
-    { en: "He washes", es: "lava" },
-    { en: "He does not wash", es: "no lava" },
-    { en: "Does he wash?", es: "lava?" },
-    { en: "She washes", es: "lava" },
-    { en: "She does not wash", es: "no lava" },
-    { en: "Does she wash?", es: "lava?" },
-    { en: "We wash", es: "lavamos" },
-    { en: "We do not wash", es: "no lavamos" },
-    { en: "Do we wash?", es: "lavamos?" },
-    { en: "They wash", es: "lavan" },
-    { en: "They do not wash", es: "no lavan" },
-    { en: "Do they wash?", es: "lavan?" },
-    { en: "I greet", es: "saludo" },
-    { en: "I do not greet", es: "no saludo" },
-    { en: "Do I greet?", es: "saludo?" },
-    { en: "You greet", es: "saludas" },
-    { en: "You do not greet", es: "no saludas" },
-    { en: "Do you greet?", es: "saludas?" },
-    { en: "He greets", es: "saluda" },
-    { en: "He does not greet", es: "no saluda" },
-    { en: "Does he greet?", es: "saluda?" },
-    { en: "She greets", es: "saluda" },
-    { en: "She does not greet", es: "no saluda" },
-    { en: "Does she greet?", es: "saluda?" },
-    { en: "We greet", es: "saludamos" },
-    { en: "We do not greet", es: "no saludamos" },
-    { en: "Do we greet?", es: "saludamos?" },
-    { en: "They greet", es: "saludan" },
-    { en: "They do not greet", es: "no saludan" },
-    { en: "Do they greet?", es: "saludan?" },
-    { en: "I win", es: "gano" },
-    { en: "I do not win", es: "no gano" },
-    { en: "Do I win?", es: "gano?" },
-    { en: "You win", es: "ganas" },
-    { en: "You do not win", es: "no ganas" },
-    { en: "Do you win?", es: "ganas?" },
-    { en: "He wins", es: "gana" },
-    { en: "He does not win", es: "no gana" },
-    { en: "Does he win?", es: "gana?" },
-    { en: "She wins", es: "gana" },
-    { en: "She does not win", es: "no gana" },
-    { en: "Does she win?", es: "gana?" },
-    { en: "We win", es: "ganamos" },
-    { en: "We do not win", es: "no ganamos" },
-    { en: "Do we win?", es: "ganamos?" },
-    { en: "They win", es: "ganan" },
-    { en: "They do not win", es: "no ganan" },
-    { en: "Do they win?", es: "ganan?" },
-    { en: "I lose", es: "pierdo" },
-    { en: "I do not lose", es: "no pierdo" },
-    { en: "Do I lose?", es: "pierdo?" },
-    { en: "You lose", es: "pierdes" },
-    { en: "You do not lose", es: "no pierdes" },
-    { en: "Do you lose?", es: "pierdes?" },
-    { en: "He loses", es: "pierde" },
-    { en: "He does not lose", es: "no pierde" },
-    { en: "Does he lose?", es: "pierde?" },
-    { en: "She loses", es: "pierde" },
-    { en: "She does not lose", es: "no pierde" },
-    { en: "Does she lose?", es: "pierde?" },
-    { en: "We lose", es: "perdemos" },
-    { en: "We do not lose", es: "no perdemos" },
-    { en: "Do we lose?", es: "perdemos?" },
-    { en: "They lose", es: "pierden" },
-    { en: "They do not lose", es: "no pierden" },
-    { en: "Do they lose?", es: "pierden?" },
-    { en: "I see", es: "veo" },
-    { en: "I do not see", es: "no veo" },
-    { en: "Do I see?", es: "veo?" },
-    { en: "You see", es: "ves" },
-    { en: "You do not see", es: "no ves" },
-    { en: "Do you see?", es: "ves?" },
-    { en: "He sees", es: "ve" },
-    { en: "He does not see", es: "no ve" },
-    { en: "Does he see?", es: "ve?" },
-    { en: "She sees", es: "ve" },
-    { en: "She does not see", es: "no ve" },
-    { en: "Does she see?", es: "ve?" },
-    { en: "We see", es: "vemos" },
-    { en: "We do not see", es: "no vemos" },
-    { en: "Do we see?", es: "vemos?" },
-    { en: "They see", es: "ven" },
-    { en: "They do not see", es: "no ven" },
-    { en: "Do they see?", es: "ven?" },
-    { en: "I carry", es: "llevo" },
-    { en: "I do not carry", es: "no llevo" },
-    { en: "Do I carry?", es: "llevo?" },
-    { en: "You carry", es: "llevas" },
-    { en: "You do not carry", es: "no llevas" },
-    { en: "Do you carry?", es: "llevas?" },
-    { en: "He carries", es: "lleva" },
-    { en: "He does not carry", es: "no lleva" },
-    { en: "Does he carry?", es: "lleva?" },
-    { en: "She carries", es: "lleva" },
-    { en: "She does not carry", es: "no lleva" },
-    { en: "Does she carry?", es: "lleva?" },
-    { en: "We carry", es: "llevamos" },
-    { en: "We do not carry", es: "no llevamos" },
-    { en: "Do we carry?", es: "llevamos?" },
-    { en: "They carry", es: "llevan" },
-    { en: "They do not carry", es: "no llevan" },
-    { en: "Do they carry?", es: "llevan?" },
-  ],
-  Past: [
-    { en: "I wanted", es: "quise" },
-    { en: "I did not want", es: "no quise" },
-    { en: "Did I want?", es: "quise?" },
-    { en: "You wanted", es: "quisiste" },
-    { en: "You did not want", es: "no quisiste" },
-    { en: "Did you want?", es: "quisiste?" },
-    { en: "He wanted", es: "quiso" },
-    { en: "He did not want", es: "no quiso" },
-    { en: "Did he want?", es: "quiso?" },
-    { en: "She wanted", es: "quiso" },
-    { en: "She did not want", es: "no quiso" },
-    { en: "Did she want?", es: "quiso?" },
-    { en: "We wanted", es: "quisimos" },
-    { en: "We did not want", es: "no quisimos" },
-    { en: "Did we want?", es: "quisimos?" },
-    { en: "They wanted", es: "quisieron" },
-    { en: "They did not want", es: "no quisieron" },
-    { en: "Did they want?", es: "quisieron?" },
-    { en: "I prepared", es: "preparé" },
-    { en: "I did not prepare", es: "no preparé" },
-    { en: "Did I prepare?", es: "preparé?" },
-    { en: "You prepared", es: "preparaste" },
-    { en: "You did not prepare", es: "no preparaste" },
-    { en: "Did you prepare?", es: "preparaste?" },
-    { en: "He prepared", es: "preparó" },
-    { en: "He did not prepare", es: "no preparó" },
-    { en: "Did he prepare?", es: "preparó?" },
-    { en: "She prepared", es: "preparó" },
-    { en: "She did not prepare", es: "no preparó" },
-    { en: "Did she prepare?", es: "preparó?" },
-    { en: "We prepared", es: "preparamos" },
-    { en: "We did not prepare", es: "no preparamos" },
-    { en: "Did we prepare?", es: "preparamos?" },
-    { en: "They prepared", es: "prepararon" },
-    { en: "They did not prepare", es: "no prepararon" },
-    { en: "Did they prepare?", es: "prepararon?" },
-    { en: "I drank", es: "bebí" },
-    { en: "I did not drink", es: "no bebí" },
-    { en: "Did I drink?", es: "bebí?" },
-    { en: "You drank", es: "bebiste" },
-    { en: "You did not drink", es: "no bebiste" },
-    { en: "Did you drink?", es: "bebiste?" },
-    { en: "He drank", es: "bebió" },
-    { en: "He did not drink", es: "no bebió" },
-    { en: "Did he drink?", es: "bebió?" },
-    { en: "She drank", es: "bebió" },
-    { en: "She did not drink", es: "no bebió" },
-    { en: "Did she drink?", es: "bebió?" },
-    { en: "We drank", es: "bebimos" },
-    { en: "We did not drink", es: "no bebimos" },
-    { en: "Did we drink?", es: "bebimos?" },
-    { en: "They drank", es: "bebieron" },
-    { en: "They did not drink", es: "no bebieron" },
-    { en: "Did they drink?", es: "bebieron?" },
-    { en: "I ate", es: "comí" },
-    { en: "I did not eat", es: "no comí" },
-    { en: "Did I eat?", es: "comí?" },
-    { en: "You ate", es: "comiste" },
-    { en: "You did not eat", es: "no comiste" },
-    { en: "Did you eat?", es: "comiste?" },
-    { en: "He ate", es: "comió" },
-    { en: "He did not eat", es: "no comió" },
-    { en: "Did he eat?", es: "comió?" },
-    { en: "She ate", es: "comió" },
-    { en: "She did not eat", es: "no comió" },
-    { en: "Did she eat?", es: "comió?" },
-    { en: "We ate", es: "comimos" },
-    { en: "We did not eat", es: "no comimos" },
-    { en: "Did we eat?", es: "comimos?" },
-    { en: "They ate", es: "comieron" },
-    { en: "They did not eat", es: "no comieron" },
-    { en: "Did they eat?", es: "comieron?" },
-    { en: "I wrote", es: "escribí" },
-    { en: "I did not write", es: "no escribí" },
-    { en: "Did I write?", es: "escribí?" },
-    { en: "You wrote", es: "escribiste" },
-    { en: "You did not write", es: "no escribiste" },
-    { en: "Did you write?", es: "escribiste?" },
-    { en: "He wrote", es: "escribió" },
-    { en: "He did not write", es: "no escribió" },
-    { en: "Did he write?", es: "escribió?" },
-    { en: "She wrote", es: "escribió" },
-    { en: "She did not write", es: "no escribió" },
-    { en: "Did she write?", es: "escribió?" },
-    { en: "We wrote", es: "escribimos" },
-    { en: "We did not write", es: "no escribimos" },
-    { en: "Did we write?", es: "escribimos?" },
-    { en: "They wrote", es: "escribieron" },
-    { en: "They did not write", es: "no escribieron" },
-    { en: "Did they write?", es: "escribieron?" },
-    { en: "I studied", es: "estudié" },
-    { en: "I did not study", es: "no estudié" },
-    { en: "Did I study?", es: "estudié?" },
-    { en: "You studied", es: "estudiaste" },
-    { en: "You did not study", es: "no estudiaste" },
-    { en: "Did you study?", es: "estudiaste?" },
-    { en: "He studied", es: "estudió" },
-    { en: "He did not study", es: "no estudió" },
-    { en: "Did he study?", es: "estudió?" },
-    { en: "She studied", es: "estudió" },
-    { en: "She did not study", es: "no estudió" },
-    { en: "Did she study?", es: "estudió?" },
-    { en: "We studied", es: "estudiamos" },
-    { en: "We did not study", es: "no estudiamos" },
-    { en: "Did we study?", es: "estudiamos?" },
-    { en: "They studied", es: "estudiaron" },
-    { en: "They did not study", es: "no estudiaron" },
-    { en: "Did they study?", es: "estudiaron?" },
-    { en: "I sang", es: "canté" },
-    { en: "I did not sing", es: "no canté" },
-    { en: "Did I sing?", es: "canté?" },
-    { en: "You sang", es: "cantaste" },
-    { en: "You did not sing", es: "no cantaste" },
-    { en: "Did you sing?", es: "cantaste?" },
-    { en: "He sang", es: "cantó" },
-    { en: "He did not sing", es: "no cantó" },
-    { en: "Did he sing?", es: "cantó?" },
-    { en: "She sang", es: "cantó" },
-    { en: "She did not sing", es: "no cantó" },
-    { en: "Did she sing?", es: "cantó?" },
-    { en: "We sang", es: "cantamos" },
-    { en: "We did not sing", es: "no cantamos" },
-    { en: "Did we sing?", es: "cantamos?" },
-    { en: "They sang", es: "cantaron" },
-    { en: "They did not sing", es: "no cantaron" },
-    { en: "Did they sing?", es: "cantaron?" },
-    { en: "I went", es: "fui" },
-    { en: "I did not go", es: "no fui" },
-    { en: "Did I go?", es: "fui?" },
-    { en: "You went", es: "fuiste" },
-    { en: "You did not go", es: "no fuiste" },
-    { en: "Did you go?", es: "fuiste?" },
-    { en: "He went", es: "fue" },
-    { en: "He did not go", es: "no fue" },
-    { en: "Did he go?", es: "fue?" },
-    { en: "She went", es: "fue" },
-    { en: "She did not go", es: "no fue" },
-    { en: "Did she go?", es: "fue?" },
-    { en: "We went", es: "fuimos" },
-    { en: "We did not go", es: "no fuimos" },
-    { en: "Did we go?", es: "fuimos?" },
-    { en: "They went", es: "fueron" },
-    { en: "They did not go", es: "no fueron" },
-    { en: "Did they go?", es: "fueron?" },
-    { en: "I lived", es: "viví" },
-    { en: "I did not live", es: "no viví" },
-    { en: "Did I live?", es: "viví?" },
-    { en: "You lived", es: "viviste" },
-    { en: "You did not live", es: "no viviste" },
-    { en: "Did you live?", es: "viviste?" },
-    { en: "He lived", es: "vivió" },
-    { en: "He did not live", es: "no vivió" },
-    { en: "Did he live?", es: "vivió?" },
-    { en: "She lived", es: "vivió" },
-    { en: "She did not live", es: "no vivió" },
-    { en: "Did she live?", es: "vivió?" },
-    { en: "We lived", es: "vivimos" },
-    { en: "We did not live", es: "no vivimos" },
-    { en: "Did we live?", es: "vivimos?" },
-    { en: "They lived", es: "vivieron" },
-    { en: "They did not live", es: "no vivieron" },
-    { en: "Did they live?", es: "vivieron?" },
-    { en: "I had", es: "tuve" },
-    { en: "I did not have", es: "no tuve" },
-    { en: "Did I have?", es: "tuve?" },
-    { en: "You had", es: "tuviste" },
-    { en: "You did not have", es: "no tuviste" },
-    { en: "Did you have?", es: "tuviste?" },
-    { en: "He had", es: "tuvo" },
-    { en: "He did not have", es: "no tuvo" },
-    { en: "Did he have?", es: "tuvo?" },
-    { en: "She had", es: "tuvo" },
-    { en: "She did not have", es: "no tuvo" },
-    { en: "Did she have?", es: "tuvo?" },
-    { en: "We had", es: "tuvimos" },
-    { en: "We did not have", es: "no tuvimos" },
-    { en: "Did we have?", es: "tuvimos?" },
-    { en: "They had", es: "tuvieron" },
-    { en: "They did not have", es: "no tuvieron" },
-    { en: "Did they have?", es: "tuvieron?" },
-    { en: "I drove", es: "conduje" },
-    { en: "I did not drive", es: "no conduje" },
-    { en: "Did I drive?", es: "conduje?" },
-    { en: "You drove", es: "condujiste" },
-    { en: "You did not drive", es: "no condujiste" },
-    { en: "Did you drive?", es: "condujiste?" },
-    { en: "He drove", es: "condujo" },
-    { en: "He did not drive", es: "no condujo" },
-    { en: "Did he drive?", es: "condujo?" },
-    { en: "She drove", es: "condujo" },
-    { en: "She did not drive", es: "no condujo" },
-    { en: "Did she drive?", es: "condujo?" },
-    { en: "We drove", es: "condujimos" },
-    { en: "We did not drive", es: "no condujimos" },
-    { en: "Did we drive?", es: "condujimos?" },
-    { en: "They drove", es: "condujeron" },
-    { en: "They did not drive", es: "no condujeron" },
-    { en: "Did they drive?", es: "condujeron?" },
-    { en: "I burned", es: "quemé" },
-    { en: "I did not burn", es: "no quemé" },
-    { en: "Did I burn?", es: "quemé?" },
-    { en: "You burned", es: "quemaste" },
-    { en: "You did not burn", es: "no quemaste" },
-    { en: "Did you burn?", es: "quemaste?" },
-    { en: "He burned", es: "quemó" },
-    { en: "He did not burn", es: "no quemó" },
-    { en: "Did he burn?", es: "quemó?" },
-    { en: "She burned", es: "quemó" },
-    { en: "She did not burn", es: "no quemó" },
-    { en: "Did she burn?", es: "quemó?" },
-    { en: "We burned", es: "quemamos" },
-    { en: "We did not burn", es: "no quemamos" },
-    { en: "Did we burn?", es: "quemamos?" },
-    { en: "They burned", es: "quemaron" },
-    { en: "They did not burn", es: "no quemaron" },
-    { en: "Did they burn?", es: "quemaron?" },
-    { en: "I liked", es: "me gustó" },
-    { en: "I did not like", es: "no me gustó" },
-    { en: "Did I like?", es: "me gustó?" },
-    { en: "You liked", es: "te gustó" },
-    { en: "You did not like", es: "no te gustó" },
-    { en: "Did you like?", es: "te gustó?" },
-    { en: "He liked", es: "le gustó" },
-    { en: "He did not like", es: "no le gustó" },
-    { en: "Did he like?", es: "le gustó?" },
-    { en: "She liked", es: "le gustó" },
-    { en: "She did not like", es: "no le gustó" },
-    { en: "Did she like?", es: "le gustó?" },
-    { en: "We liked", es: "nos gustó" },
-    { en: "We did not like", es: "no nos gustó" },
-    { en: "Did we like?", es: "nos gustó?" },
-    { en: "They liked", es: "les gustó" },
-    { en: "They did not like", es: "no les gustó" },
-    { en: "Did they like?", es: "les gustó?" },
-    { en: "I loved", es: "me encantó" },
-    { en: "I did not love", es: "no me encantó" },
-    { en: "Did I love?", es: "me encantó?" },
-    { en: "You loved", es: "te encantó" },
-    { en: "You did not love", es: "no te encantó" },
-    { en: "Did you love?", es: "te encantó?" },
-    { en: "He loved", es: "le encantó" },
-    { en: "He did not love", es: "no le encantó" },
-    { en: "Did he love?", es: "le encantó?" },
-    { en: "She loved", es: "le encantó" },
-    { en: "She did not love", es: "no le encantó" },
-    { en: "Did she love?", es: "le encantó?" },
-    { en: "We loved", es: "nos encantó" },
-    { en: "We did not love", es: "no nos encantó" },
-    { en: "Did we love?", es: "nos encantó?" },
-    { en: "They loved", es: "les encantó" },
-    { en: "They did not love", es: "no les encantó" },
-    { en: "Did they love?", es: "les encantó?" },
-    { en: "I opened", es: "abrí" },
-    { en: "I did not open", es: "no abrí" },
-    { en: "Did I open?", es: "abrí?" },
-    { en: "You opened", es: "abriste" },
-    { en: "You did not open", es: "no abriste" },
-    { en: "Did you open?", es: "abriste?" },
-    { en: "He opened", es: "abrió" },
-    { en: "He did not open", es: "no abrió" },
-    { en: "Did he open?", es: "abrió?" },
-    { en: "She opened", es: "abrió" },
-    { en: "She did not open", es: "no abrió" },
-    { en: "Did she open?", es: "abrió?" },
-    { en: "We opened", es: "abrimos" },
-    { en: "We did not open", es: "no abrimos" },
-    { en: "Did we open?", es: "abrimos?" },
-    { en: "They opened", es: "abrieron" },
-    { en: "They did not open", es: "no abrieron" },
-    { en: "Did they open?", es: "abrieron?" },
-    { en: "I closed", es: "cerré" },
-    { en: "I did not close", es: "no cerré" },
-    { en: "Did I close?", es: "cerré?" },
-    { en: "You closed", es: "cerraste" },
-    { en: "You did not close", es: "no cerraste" },
-    { en: "Did you close?", es: "cerraste?" },
-    { en: "He closed", es: "cerró" },
-    { en: "He did not close", es: "no cerró" },
-    { en: "Did he close?", es: "cerró?" },
-    { en: "She closed", es: "cerró" },
-    { en: "She did not close", es: "no cerró" },
-    { en: "Did she close?", es: "cerró?" },
-    { en: "We closed", es: "cerramos" },
-    { en: "We did not close", es: "no cerramos" },
-    { en: "Did we close?", es: "cerramos?" },
-    { en: "They closed", es: "cerraron" },
-    { en: "They did not close", es: "no cerraron" },
-    { en: "Did they close?", es: "cerraron?" },
-    { en: "I played", es: "jugué" },
-    { en: "I did not play", es: "no jugué" },
-    { en: "Did I play?", es: "jugué?" },
-    { en: "You played", es: "jugaste" },
-    { en: "You did not play", es: "no jugaste" },
-    { en: "Did you play?", es: "jugaste?" },
-    { en: "He played", es: "jugó" },
-    { en: "He did not play", es: "no jugó" },
-    { en: "Did he play?", es: "jugó?" },
-    { en: "She played", es: "jugó" },
-    { en: "She did not play", es: "no jugó" },
-    { en: "Did she play?", es: "jugó?" },
-    { en: "We played", es: "jugamos" },
-    { en: "We did not play", es: "no jugamos" },
-    { en: "Did we play?", es: "jugamos?" },
-    { en: "They played", es: "jugaron" },
-    { en: "They did not play", es: "no jugaron" },
-    { en: "Did they play?", es: "jugaron?" },
-    { en: "I swam", es: "nadé" },
-    { en: "I did not swim", es: "no nadé" },
-    { en: "Did I swim?", es: "nadé?" },
-    { en: "You swam", es: "nadaste" },
-    { en: "You did not swim", es: "no nadaste" },
-    { en: "Did you swim?", es: "nadaste?" },
-    { en: "He swam", es: "nadó" },
-    { en: "He did not swim", es: "no nadó" },
-    { en: "Did he swim?", es: "nadó?" },
-    { en: "She swam", es: "nadó" },
-    { en: "She did not swim", es: "no nadó" },
-    { en: "Did she swim?", es: "nadó?" },
-    { en: "We swam", es: "nadamos" },
-    { en: "We did not swim", es: "no nadamos" },
-    { en: "Did we swim?", es: "nadamos?" },
-    { en: "They swam", es: "nadaron" },
-    { en: "They did not swim", es: "no nadaron" },
-    { en: "Did they swim?", es: "nadaron?" },
-    { en: "I drew", es: "dibujé" },
-    { en: "I did not draw", es: "no dibujé" },
-    { en: "Did I draw?", es: "dibujé?" },
-    { en: "You drew", es: "dibujaste" },
-    { en: "You did not draw", es: "no dibujaste" },
-    { en: "Did you draw?", es: "dibujaste?" },
-    { en: "He drew", es: "dibujó" },
-    { en: "He did not draw", es: "no dibujó" },
-    { en: "Did he draw?", es: "dibujó?" },
-    { en: "She drew", es: "dibujó" },
-    { en: "She did not draw", es: "no dibujó" },
-    { en: "Did she draw?", es: "dibujó?" },
-    { en: "We drew", es: "dibujamos" },
-    { en: "We did not draw", es: "no dibujamos" },
-    { en: "Did we draw?", es: "dibujamos?" },
-    { en: "They drew", es: "dibujaron" },
-    { en: "They did not draw", es: "no dibujaron" },
-    { en: "Did they draw?", es: "dibujaron?" },
-    { en: "I washed", es: "lavé" },
-    { en: "I did not wash", es: "no lavé" },
-    { en: "Did I wash?", es: "lavé?" },
-    { en: "You washed", es: "lavaste" },
-    { en: "You did not wash", es: "no lavaste" },
-    { en: "Did you wash?", es: "lavaste?" },
-    { en: "He washed", es: "lavó" },
-    { en: "He did not wash", es: "no lavó" },
-    { en: "Did he wash?", es: "lavó?" },
-    { en: "She washed", es: "lavó" },
-    { en: "She did not wash", es: "no lavó" },
-    { en: "Did she wash?", es: "lavó?" },
-    { en: "We washed", es: "lavamos" },
-    { en: "We did not wash", es: "no lavamos" },
-    { en: "Did we wash?", es: "lavamos?" },
-    { en: "They washed", es: "lavaron" },
-    { en: "They did not wash", es: "no lavaron" },
-    { en: "Did they wash?", es: "lavaron?" },
-    { en: "I greeted", es: "saludé" },
-    { en: "I did not greet", es: "no saludé" },
-    { en: "Did I greet?", es: "saludé?" },
-    { en: "You greeted", es: "saludaste" },
-    { en: "You did not greet", es: "no saludaste" },
-    { en: "Did you greet?", es: "saludaste?" },
-    { en: "He greeted", es: "saludó" },
-    { en: "He did not greet", es: "no saludó" },
-    { en: "Did he greet?", es: "saludó?" },
-    { en: "She greeted", es: "saludó" },
-    { en: "She did not greet", es: "no saludó" },
-    { en: "Did she greet?", es: "saludó?" },
-    { en: "We greeted", es: "saludamos" },
-    { en: "We did not greet", es: "no saludamos" },
-    { en: "Did we greet?", es: "saludamos?" },
-    { en: "They greeted", es: "saludaron" },
-    { en: "They did not greet", es: "no saludaron" },
-    { en: "Did they greet?", es: "saludaron?" },
-    { en: "I won", es: "gané" },
-    { en: "I did not win", es: "no gané" },
-    { en: "Did I win?", es: "gané?" },
-    { en: "You won", es: "ganaste" },
-    { en: "You did not win", es: "no ganaste" },
-    { en: "Did you win?", es: "ganaste?" },
-    { en: "He won", es: "ganó" },
-    { en: "He did not win", es: "no ganó" },
-    { en: "Did he win?", es: "ganó?" },
-    { en: "She won", es: "ganó" },
-    { en: "She did not win", es: "no ganó" },
-    { en: "Did she win?", es: "ganó?" },
-    { en: "We won", es: "ganamos" },
-    { en: "We did not win", es: "no ganamos" },
-    { en: "Did we win?", es: "ganamos?" },
-    { en: "They won", es: "ganaron" },
-    { en: "They did not win", es: "no ganaron" },
-    { en: "Did they win?", es: "ganaron?" },
-    { en: "I lost", es: "perdí" },
-    { en: "I did not lose", es: "no perdí" },
-    { en: "Did I lose?", es: "perdí?" },
-    { en: "You lost", es: "perdiste" },
-    { en: "You did not lose", es: "no perdiste" },
-    { en: "Did you lose?", es: "perdiste?" },
-    { en: "He lost", es: "perdió" },
-    { en: "He did not lose", es: "no perdió" },
-    { en: "Did he lose?", es: "perdió?" },
-    { en: "She lost", es: "perdió" },
-    { en: "She did not lose", es: "no perdió" },
-    { en: "Did she lose?", es: "perdió?" },
-    { en: "We lost", es: "perdimos" },
-    { en: "We did not lose", es: "no perdimos" },
-    { en: "Did we lose?", es: "perdimos?" },
-    { en: "They lost", es: "perdieron" },
-    { en: "They did not lose", es: "no perdieron" },
-    { en: "Did they lose?", es: "perdieron?" },
-    { en: "I saw", es: "vi" },
-    { en: "I did not see", es: "no vi" },
-    { en: "Did I see?", es: "vi?" },
-    { en: "You saw", es: "viste" },
-    { en: "You did not see", es: "no viste" },
-    { en: "Did you see?", es: "viste?" },
-    { en: "He saw", es: "vio" },
-    { en: "He did not see", es: "no vio" },
-    { en: "Did he see?", es: "vio?" },
-    { en: "She saw", es: "vio" },
-    { en: "She did not see", es: "no vio" },
-    { en: "Did she see?", es: "vio?" },
-    { en: "We saw", es: "vimos" },
-    { en: "We did not see", es: "no vimos" },
-    { en: "Did we see?", es: "vimos?" },
-    { en: "They saw", es: "vieron" },
-    { en: "They did not see", es: "no vieron" },
-    { en: "Did they see?", es: "vieron?" },
-    { en: "I carried", es: "llevé" },
-    { en: "I did not carry", es: "no llevé" },
-    { en: "Did I carry?", es: "llevé?" },
-    { en: "You carried", es: "llevaste" },
-    { en: "You did not carry", es: "no llevaste" },
-    { en: "Did you carry?", es: "llevaste?" },
-    { en: "He carried", es: "llevó" },
-    { en: "He did not carry", es: "no llevó" },
-    { en: "Did he carry?", es: "llevó?" },
-    { en: "She carried", es: "llevó" },
-    { en: "She did not carry", es: "no llevó" },
-    { en: "Did she carry?", es: "llevó?" },
-    { en: "We carried", es: "llevamos" },
-    { en: "We did not carry", es: "no llevamos" },
-    { en: "Did we carry?", es: "llevamos?" },
-    { en: "They carried", es: "llevaron" },
-    { en: "They did not carry", es: "no llevaron" },
-    { en: "Did they carry?", es: "llevaron?" },
-  ],
-  Future: [
-    { en: "I will want", es: "querré" },
-    { en: "I will not want", es: "no querré" },
-    { en: "Will I want?", es: "querré?" },
-    { en: "You will want", es: "querrás" },
-    { en: "You will not want", es: "no querrás" },
-    { en: "Will you want?", es: "querrás?" },
-    { en: "He will want", es: "querrá" },
-    { en: "He will not want", es: "no querrá" },
-    { en: "Will he want?", es: "querrá?" },
-    { en: "She will want", es: "querrá" },
-    { en: "She will not want", es: "no querrá" },
-    { en: "Will she want?", es: "querrá?" },
-    { en: "We will want", es: "querremos" },
-    { en: "We will not want", es: "no querremos" },
-    { en: "Will we want?", es: "querremos?" },
-    { en: "They will want", es: "querrán" },
-    { en: "They will not want", es: "no querrán" },
-    { en: "Will they want?", es: "querrán?" },
-    { en: "I will prepare", es: "prepararé" },
-    { en: "I will not prepare", es: "no prepararé" },
-    { en: "Will I prepare?", es: "prepararé?" },
-    { en: "You will prepare", es: "prepararás" },
-    { en: "You will not prepare", es: "no prepararás" },
-    { en: "Will you prepare?", es: "prepararás?" },
-    { en: "He will prepare", es: "preparará" },
-    { en: "He will not prepare", es: "no preparará" },
-    { en: "Will he prepare?", es: "preparará?" },
-    { en: "She will prepare", es: "preparará" },
-    { en: "She will not prepare", es: "no preparará" },
-    { en: "Will she prepare?", es: "preparará?" },
-    { en: "We will prepare", es: "prepararemos" },
-    { en: "We will not prepare", es: "no prepararemos" },
-    { en: "Will we prepare?", es: "prepararemos?" },
-    { en: "They will prepare", es: "prepararán" },
-    { en: "They will not prepare", es: "no prepararán" },
-    { en: "Will they prepare?", es: "prepararán?" },
-    { en: "I will drink", es: "beberé" },
-    { en: "I will not drink", es: "no beberé" },
-    { en: "Will I drink?", es: "beberé?" },
-    { en: "You will drink", es: "beberás" },
-    { en: "You will not drink", es: "no beberás" },
-    { en: "Will you drink?", es: "beberás?" },
-    { en: "He will drink", es: "beberá" },
-    { en: "He will not drink", es: "no beberá" },
-    { en: "Will he drink?", es: "beberá?" },
-    { en: "She will drink", es: "beberá" },
-    { en: "She will not drink", es: "no beberá" },
-    { en: "Will she drink?", es: "beberá?" },
-    { en: "We will drink", es: "beberemos" },
-    { en: "We will not drink", es: "no beberemos" },
-    { en: "Will we drink?", es: "beberemos?" },
-    { en: "They will drink", es: "beberán" },
-    { en: "They will not drink", es: "no beberán" },
-    { en: "Will they drink?", es: "beberán?" },
-    { en: "I will eat", es: "comeré" },
-    { en: "I will not eat", es: "no comeré" },
-    { en: "Will I eat?", es: "comeré?" },
-    { en: "You will eat", es: "comerás" },
-    { en: "You will not eat", es: "no comerás" },
-    { en: "Will you eat?", es: "comerás?" },
-    { en: "He will eat", es: "comerá" },
-    { en: "He will not eat", es: "no comerá" },
-    { en: "Will he eat?", es: "comerá?" },
-    { en: "She will eat", es: "comerá" },
-    { en: "She will not eat", es: "no comerá" },
-    { en: "Will she eat?", es: "comerá?" },
-    { en: "We will eat", es: "comeremos" },
-    { en: "We will not eat", es: "no comeremos" },
-    { en: "Will we eat?", es: "comeremos?" },
-    { en: "They will eat", es: "comerán" },
-    { en: "They will not eat", es: "no comerán" },
-    { en: "Will they eat?", es: "comerán?" },
-    { en: "I will write", es: "escribiré" },
-    { en: "I will not write", es: "no escribiré" },
-    { en: "Will I write?", es: "escribiré?" },
-    { en: "You will write", es: "escribirás" },
-    { en: "You will not write", es: "no escribirás" },
-    { en: "Will you write?", es: "escribirás?" },
-    { en: "He will write", es: "escribirá" },
-    { en: "He will not write", es: "no escribirá" },
-    { en: "Will he write?", es: "escribirá?" },
-    { en: "She will write", es: "escribirá" },
-    { en: "She will not write", es: "no escribirá" },
-    { en: "Will she write?", es: "escribirá?" },
-    { en: "We will write", es: "escribiremos" },
-    { en: "We will not write", es: "no escribiremos" },
-    { en: "Will we write?", es: "escribiremos?" },
-    { en: "They will write", es: "escribirán" },
-    { en: "They will not write", es: "no escribirán" },
-    { en: "Will they write?", es: "escribirán?" },
-    { en: "I will study", es: "estudiaré" },
-    { en: "I will not study", es: "no estudiaré" },
-    { en: "Will I study?", es: "estudiaré?" },
-    { en: "You will study", es: "estudiarás" },
-    { en: "You will not study", es: "no estudiarás" },
-    { en: "Will you study?", es: "estudiarás?" },
-    { en: "He will study", es: "estudiará" },
-    { en: "He will not study", es: "no estudiará" },
-    { en: "Will he study?", es: "estudiará?" },
-    { en: "She will study", es: "estudiará" },
-    { en: "She will not study", es: "no estudiará" },
-    { en: "Will she study?", es: "estudiará?" },
-    { en: "We will study", es: "estudiaremos" },
-    { en: "We will not study", es: "no estudiaremos" },
-    { en: "Will we study?", es: "estudiaremos?" },
-    { en: "They will study", es: "estudiarán" },
-    { en: "They will not study", es: "no estudiarán" },
-    { en: "Will they study?", es: "estudiarán?" },
-    { en: "I will sing", es: "cantaré" },
-    { en: "I will not sing", es: "no cantaré" },
-    { en: "Will I sing?", es: "cantaré?" },
-    { en: "You will sing", es: "cantarás" },
-    { en: "You will not sing", es: "no cantarás" },
-    { en: "Will you sing?", es: "cantarás?" },
-    { en: "He will sing", es: "cantará" },
-    { en: "He will not sing", es: "no cantará" },
-    { en: "Will he sing?", es: "cantará?" },
-    { en: "She will sing", es: "cantará" },
-    { en: "She will not sing", es: "no cantará" },
-    { en: "Will she sing?", es: "cantará?" },
-    { en: "We will sing", es: "cantaremos" },
-    { en: "We will not sing", es: "no cantaremos" },
-    { en: "Will we sing?", es: "cantaremos?" },
-    { en: "They will sing", es: "cantarán" },
-    { en: "They will not sing", es: "no cantarán" },
-    { en: "Will they sing?", es: "cantarán?" },
-    { en: "I will go", es: "iré" },
-    { en: "I will not go", es: "no iré" },
-    { en: "Will I go?", es: "iré?" },
-    { en: "You will go", es: "irás" },
-    { en: "You will not go", es: "no irás" },
-    { en: "Will you go?", es: "irás?" },
-    { en: "He will go", es: "irá" },
-    { en: "He will not go", es: "no irá" },
-    { en: "Will he go?", es: "irá?" },
-    { en: "She will go", es: "irá" },
-    { en: "She will not go", es: "no irá" },
-    { en: "Will she go?", es: "irá?" },
-    { en: "We will go", es: "iremos" },
-    { en: "We will not go", es: "no iremos" },
-    { en: "Will we go?", es: "iremos?" },
-    { en: "They will go", es: "irán" },
-    { en: "They will not go", es: "no irán" },
-    { en: "Will they go?", es: "irán?" },
-    { en: "I will live", es: "viviré" },
-    { en: "I will not live", es: "no viviré" },
-    { en: "Will I live?", es: "viviré?" },
-    { en: "You will live", es: "vivirás" },
-    { en: "You will not live", es: "no vivirás" },
-    { en: "Will you live?", es: "vivirás?" },
-    { en: "He will live", es: "vivirá" },
-    { en: "He will not live", es: "no vivirá" },
-    { en: "Will he live?", es: "vivirá?" },
-    { en: "She will live", es: "vivirá" },
-    { en: "She will not live", es: "no vivirá" },
-    { en: "Will she live?", es: "vivirá?" },
-    { en: "We will live", es: "viviremos" },
-    { en: "We will not live", es: "no viviremos" },
-    { en: "Will we live?", es: "viviremos?" },
-    { en: "They will live", es: "vivirán" },
-    { en: "They will not live", es: "no vivirán" },
-    { en: "Will they live?", es: "vivirán?" },
-    { en: "I will have", es: "tendré" },
-    { en: "I will not have", es: "no tendré" },
-    { en: "Will I have?", es: "tendré?" },
-    { en: "You will have", es: "tendrás" },
-    { en: "You will not have", es: "no tendrás" },
-    { en: "Will you have?", es: "tendrás?" },
-    { en: "He will have", es: "tendrá" },
-    { en: "He will not have", es: "no tendrá" },
-    { en: "Will he have?", es: "tendrá?" },
-    { en: "She will have", es: "tendrá" },
-    { en: "She will not have", es: "no tendrá" },
-    { en: "Will she have?", es: "tendrá?" },
-    { en: "We will have", es: "tendremos" },
-    { en: "We will not have", es: "no tendremos" },
-    { en: "Will we have?", es: "tendremos?" },
-    { en: "They will have", es: "tendrán" },
-    { en: "They will not have", es: "no tendrán" },
-    { en: "Will they have?", es: "tendrán?" },
-    { en: "I will drive", es: "conduciré" },
-    { en: "I will not drive", es: "no conduciré" },
-    { en: "Will I drive?", es: "conduciré?" },
-    { en: "You will drive", es: "conducirás" },
-    { en: "You will not drive", es: "no conducirás" },
-    { en: "Will you drive?", es: "conducirás?" },
-    { en: "He will drive", es: "conducirá" },
-    { en: "He will not drive", es: "no conducirá" },
-    { en: "Will he drive?", es: "conducirá?" },
-    { en: "She will drive", es: "conducirá" },
-    { en: "She will not drive", es: "no conducirá" },
-    { en: "Will she drive?", es: "conducirá?" },
-    { en: "We will drive", es: "conduciremos" },
-    { en: "We will not drive", es: "no conduciremos" },
-    { en: "Will we drive?", es: "conduciremos?" },
-    { en: "They will drive", es: "conducirán" },
-    { en: "They will not drive", es: "no conducirán" },
-    { en: "Will they drive?", es: "conducirán?" },
-    { en: "I will burn", es: "quemaré" },
-    { en: "I will not burn", es: "no quemaré" },
-    { en: "Will I burn?", es: "quemaré?" },
-    { en: "You will burn", es: "quemarás" },
-    { en: "You will not burn", es: "no quemarás" },
-    { en: "Will you burn?", es: "quemarás?" },
-    { en: "He will burn", es: "quemará" },
-    { en: "He will not burn", es: "no quemará" },
-    { en: "Will he burn?", es: "quemará?" },
-    { en: "She will burn", es: "quemará" },
-    { en: "She will not burn", es: "no quemará" },
-    { en: "Will she burn?", es: "quemará?" },
-    { en: "We will burn", es: "quemaremos" },
-    { en: "We will not burn", es: "no quemaremos" },
-    { en: "Will we burn?", es: "quemaremos?" },
-    { en: "They will burn", es: "quemarán" },
-    { en: "They will not burn", es: "no quemarán" },
-    { en: "Will they burn?", es: "quemarán?" },
-    { en: "I will like", es: "me gustará" },
-    { en: "I will not like", es: "no me gustará" },
-    { en: "Will I like?", es: "me gustará?" },
-    { en: "You will like", es: "te gustará" },
-    { en: "You will not like", es: "no te gustará" },
-    { en: "Will you like?", es: "te gustará?" },
-    { en: "He will like", es: "le gustará" },
-    { en: "He will not like", es: "no le gustará" },
-    { en: "Will he like?", es: "le gustará?" },
-    { en: "She will like", es: "le gustará" },
-    { en: "She will not like", es: "no le gustará" },
-    { en: "Will she like?", es: "le gustará?" },
-    { en: "We will like", es: "nos gustará" },
-    { en: "We will not like", es: "no nos gustará" },
-    { en: "Will we like?", es: "nos gustará?" },
-    { en: "They will like", es: "les gustará" },
-    { en: "They will not like", es: "no les gustará" },
-    { en: "Will they like?", es: "les gustará?" },
-    { en: "I will love", es: "me encantará" },
-    { en: "I will not love", es: "no me encantará" },
-    { en: "Will I love?", es: "me encantará?" },
-    { en: "You will love", es: "te encantará" },
-    { en: "You will not love", es: "no te encantará" },
-    { en: "Will you love?", es: "te encantará?" },
-    { en: "He will love", es: "le encantará" },
-    { en: "He will not love", es: "no le encantará" },
-    { en: "Will he love?", es: "le encantará?" },
-    { en: "She will love", es: "le encantará" },
-    { en: "She will not love", es: "no le encantará" },
-    { en: "Will she love?", es: "le encantará?" },
-    { en: "We will love", es: "nos encantará" },
-    { en: "We will not love", es: "no nos encantará" },
-    { en: "Will we love?", es: "nos encantará?" },
-    { en: "They will love", es: "les encantará" },
-    { en: "They will not love", es: "no les encantará" },
-    { en: "Will they love?", es: "les encantará?" },
-    { en: "I will open", es: "abriré" },
-    { en: "I will not open", es: "no abriré" },
-    { en: "Will I open?", es: "abriré?" },
-    { en: "You will open", es: "abrirás" },
-    { en: "You will not open", es: "no abrirás" },
-    { en: "Will you open?", es: "abrirás?" },
-    { en: "He will open", es: "abrirá" },
-    { en: "He will not open", es: "no abrirá" },
-    { en: "Will he open?", es: "abrirá?" },
-    { en: "She will open", es: "abrirá" },
-    { en: "She will not open", es: "no abrirá" },
-    { en: "Will she open?", es: "abrirá?" },
-    { en: "We will open", es: "abriremos" },
-    { en: "We will not open", es: "no abriremos" },
-    { en: "Will we open?", es: "abriremos?" },
-    { en: "They will open", es: "abrirán" },
-    { en: "They will not open", es: "no abrirán" },
-    { en: "Will they open?", es: "abrirán?" },
-    { en: "I will close", es: "cerraré" },
-    { en: "I will not close", es: "no cerraré" },
-    { en: "Will I close?", es: "cerraré?" },
-    { en: "You will close", es: "cerrarás" },
-    { en: "You will not close", es: "no cerrarás" },
-    { en: "Will you close?", es: "cerrarás?" },
-    { en: "He will close", es: "cerrará" },
-    { en: "He will not close", es: "no cerrará" },
-    { en: "Will he close?", es: "cerrará?" },
-    { en: "She will close", es: "cerrará" },
-    { en: "She will not close", es: "no cerrará" },
-    { en: "Will she close?", es: "cerrará?" },
-    { en: "We will close", es: "cerraremos" },
-    { en: "We will not close", es: "no cerraremos" },
-    { en: "Will we close?", es: "cerraremos?" },
-    { en: "They will close", es: "cerrarán" },
-    { en: "They will not close", es: "no cerrarán" },
-    { en: "Will they close?", es: "cerrarán?" },
-    { en: "I will play", es: "jugaré" },
-    { en: "I will not play", es: "no jugaré" },
-    { en: "Will I play?", es: "jugaré?" },
-    { en: "You will play", es: "jugarás" },
-    { en: "You will not play", es: "no jugarás" },
-    { en: "Will you play?", es: "jugarás?" },
-    { en: "He will play", es: "jugará" },
-    { en: "He will not play", es: "no jugará" },
-    { en: "Will he play?", es: "jugará?" },
-    { en: "She will play", es: "jugará" },
-    { en: "She will not play", es: "no jugará" },
-    { en: "Will she play?", es: "jugará?" },
-    { en: "We will play", es: "jugaremos" },
-    { en: "We will not play", es: "no jugaremos" },
-    { en: "Will we play?", es: "jugaremos?" },
-    { en: "They will play", es: "jugarán" },
-    { en: "They will not play", es: "no jugarán" },
-    { en: "Will they play?", es: "jugarán?" },
-    { en: "I will swim", es: "nadaré" },
-    { en: "I will not swim", es: "no nadaré" },
-    { en: "Will I swim?", es: "nadaré?" },
-    { en: "You will swim", es: "nadarás" },
-    { en: "You will not swim", es: "no nadarás" },
-    { en: "Will you swim?", es: "nadarás?" },
-    { en: "He will swim", es: "nadará" },
-    { en: "He will not swim", es: "no nadará" },
-    { en: "Will he swim?", es: "nadará?" },
-    { en: "She will swim", es: "nadará" },
-    { en: "She will not swim", es: "no nadará" },
-    { en: "Will she swim?", es: "nadará?" },
-    { en: "We will swim", es: "nadaremos" },
-    { en: "We will not swim", es: "no nadaremos" },
-    { en: "Will we swim?", es: "nadaremos?" },
-    { en: "They will swim", es: "nadarán" },
-    { en: "They will not swim", es: "no nadarán" },
-    { en: "Will they swim?", es: "nadarán?" },
-    { en: "I will draw", es: "dibujaré" },
-    { en: "I will not draw", es: "no dibujaré" },
-    { en: "Will I draw?", es: "dibujaré?" },
-    { en: "You will draw", es: "dibujarás" },
-    { en: "You will not draw", es: "no dibujarás" },
-    { en: "Will you draw?", es: "dibujarás?" },
-    { en: "He will draw", es: "dibujará" },
-    { en: "He will not draw", es: "no dibujará" },
-    { en: "Will he draw?", es: "dibujará?" },
-    { en: "She will draw", es: "dibujará" },
-    { en: "She will not draw", es: "no dibujará" },
-    { en: "Will she draw?", es: "dibujará?" },
-    { en: "We will draw", es: "dibujaremos" },
-    { en: "We will not draw", es: "no dibujaremos" },
-    { en: "Will we draw?", es: "dibujaremos?" },
-    { en: "They will draw", es: "dibujarán" },
-    { en: "They will not draw", es: "no dibujarán" },
-    { en: "Will they draw?", es: "dibujarán?" },
-    { en: "I will wash", es: "lavaré" },
-    { en: "I will not wash", es: "no lavaré" },
-    { en: "Will I wash?", es: "lavaré?" },
-    { en: "You will wash", es: "lavarás" },
-    { en: "You will not wash", es: "no lavarás" },
-    { en: "Will you wash?", es: "lavarás?" },
-    { en: "He will wash", es: "lavará" },
-    { en: "He will not wash", es: "no lavará" },
-    { en: "Will he wash?", es: "lavará?" },
-    { en: "She will wash", es: "lavará" },
-    { en: "She will not wash", es: "no lavará" },
-    { en: "Will she wash?", es: "lavará?" },
-    { en: "We will wash", es: "lavaremos" },
-    { en: "We will not wash", es: "no lavaremos" },
-    { en: "Will we wash?", es: "lavaremos?" },
-    { en: "They will wash", es: "lavarán" },
-    { en: "They will not wash", es: "no lavarán" },
-    { en: "Will they wash?", es: "lavarán?" },
-    { en: "I will greet", es: "saludaré" },
-    { en: "I will not greet", es: "no saludaré" },
-    { en: "Will I greet?", es: "saludaré?" },
-    { en: "You will greet", es: "saludarás" },
-    { en: "You will not greet", es: "no saludarás" },
-    { en: "Will you greet?", es: "saludarás?" },
-    { en: "He will greet", es: "saludará" },
-    { en: "He will not greet", es: "no saludará" },
-    { en: "Will he greet?", es: "saludará?" },
-    { en: "She will greet", es: "saludará" },
-    { en: "She will not greet", es: "no saludará" },
-    { en: "Will she greet?", es: "saludará?" },
-    { en: "We will greet", es: "saludaremos" },
-    { en: "We will not greet", es: "no saludaremos" },
-    { en: "Will we greet?", es: "saludaremos?" },
-    { en: "They will greet", es: "saludarán" },
-    { en: "They will not greet", es: "no saludarán" },
-    { en: "Will they greet?", es: "saludarán?" },
-    { en: "I will win", es: "ganaré" },
-    { en: "I will not win", es: "no ganaré" },
-    { en: "Will I win?", es: "ganaré?" },
-    { en: "You will win", es: "ganarás" },
-    { en: "You will not win", es: "no ganarás" },
-    { en: "Will you win?", es: "ganarás?" },
-    { en: "He will win", es: "ganará" },
-    { en: "He will not win", es: "no ganará" },
-    { en: "Will he win?", es: "ganará?" },
-    { en: "She will win", es: "ganará" },
-    { en: "She will not win", es: "no ganará" },
-    { en: "Will she win?", es: "ganará?" },
-    { en: "We will win", es: "ganaremos" },
-    { en: "We will not win", es: "no ganaremos" },
-    { en: "Will we win?", es: "ganaremos?" },
-    { en: "They will win", es: "ganarán" },
-    { en: "They will not win", es: "no ganarán" },
-    { en: "Will they win?", es: "ganarán?" },
-    { en: "I will lose", es: "perderé" },
-    { en: "I will not lose", es: "no perderé" },
-    { en: "Will I lose?", es: "perderé?" },
-    { en: "You will lose", es: "perderás" },
-    { en: "You will not lose", es: "no perderás" },
-    { en: "Will you lose?", es: "perderás?" },
-    { en: "He will lose", es: "perderá" },
-    { en: "He will not lose", es: "no perderá" },
-    { en: "Will he lose?", es: "perderá?" },
-    { en: "She will lose", es: "perderá" },
-    { en: "She will not lose", es: "no perderá" },
-    { en: "Will she lose?", es: "perderá?" },
-    { en: "We will lose", es: "perderemos" },
-    { en: "We will not lose", es: "no perderemos" },
-    { en: "Will we lose?", es: "perderemos?" },
-    { en: "They will lose", es: "perderán" },
-    { en: "They will not lose", es: "no perderán" },
-    { en: "Will they lose?", es: "perderán?" },
-    { en: "I will see", es: "veré" },
-    { en: "I will not see", es: "no veré" },
-    { en: "Will I see?", es: "veré?" },
-    { en: "You will see", es: "verás" },
-    { en: "You will not see", es: "no verás" },
-    { en: "Will you see?", es: "verás?" },
-    { en: "He will see", es: "verá" },
-    { en: "He will not see", es: "no verá" },
-    { en: "Will he see?", es: "verá?" },
-    { en: "She will see", es: "verá" },
-    { en: "She will not see", es: "no verá" },
-    { en: "Will she see?", es: "verá?" },
-    { en: "We will see", es: "veremos" },
-    { en: "We will not see", es: "no veremos" },
-    { en: "Will we see?", es: "veremos?" },
-    { en: "They will see", es: "verán" },
-    { en: "They will not see", es: "no verán" },
-    { en: "Will they see?", es: "verán?" },
-    { en: "I will carry", es: "llevaré" },
-    { en: "I will not carry", es: "no llevaré" },
-    { en: "Will I carry?", es: "llevaré?" },
-    { en: "You will carry", es: "llevarás" },
-    { en: "You will not carry", es: "no llevarás" },
-    { en: "Will you carry?", es: "llevarás?" },
-    { en: "He will carry", es: "llevará" },
-    { en: "He will not carry", es: "no llevará" },
-    { en: "Will he carry?", es: "llevará?" },
-    { en: "She will carry", es: "llevará" },
-    { en: "She will not carry", es: "no llevará" },
-    { en: "Will she carry?", es: "llevará?" },
-    { en: "We will carry", es: "llevaremos" },
-    { en: "We will not carry", es: "no llevaremos" },
-    { en: "Will we carry?", es: "llevaremos?" },
-    { en: "They will carry", es: "llevarán" },
-    { en: "They will not carry", es: "no llevarán" },
-    { en: "Will they carry?", es: "llevarán?" },
-  ],
-};let currentTense = "Present";
-let currentLevel = 1;
-let unlockedLevels = { Present: 1, Past: 1, Future: 1 };
-let gameVerbs = [];
-let startTime, timerInterval;
-
-// UI
-const tenseButtons = document.querySelectorAll(".tense-button");
-const levelList = document.getElementById("level-list");
-const gameContainer = document.getElementById("game");
-const questionsContainer = document.getElementById("questions");
-const resultsContainer = document.getElementById("results");
-const controlsBar = document.getElementById("controls");
-const submitBtn = document.getElementById("submit");
-
-// --- Arcade toggles (SAFE defaults) ---
-const state = {
-  soundsOn: true,     // sounds ON by default (little “gamey”)
-  voiceOn: false,     // voice OFF by default (only after request)
-  lastFocusedInput: null
+const THEME_LABEL = {
+  yo: "Yo y mi personalidad",
+  barrio: "Mi barrio y mi casa",
+  instituto: "Mi instituto",
+  familia: "Mi familia",
+  amigos: "Mis amigos",
+  tiempo: "Tiempo libre",
+  vacaciones: "Vacaciones y viajes",
+  salud: "Deporte y salud",
+  tecnologia: "Tecnología y redes",
+  comida: "Comida y vida diaria",
+  futuro: "Planes y futuro"
 };
 
-// --- Tiny sound engine (no external files) ---
-let audioCtx = null;
-function ensureAudio() {
-  if (!state.soundsOn) return null;
-  if (!audioCtx) {
-    const Ctx = window.AudioContext || window.webkitAudioContext;
-    if (!Ctx) return null;
-    audioCtx = new Ctx();
+const THEME_ENGLISH = {
+  yo: { present: "Talk about yourself and what kind of person you are.", past: "Talk about what you were like when you were younger.", future: "Talk about the kind of person you want to be in the future." },
+  barrio: { present: "Talk about your area and your home.", past: "Talk about where you lived before.", future: "Talk about where you would like to live in the future." },
+  instituto: { present: "Talk about your school.", past: "Talk about a recent day at school.", future: "Talk about school plans for the future." },
+  familia: { present: "Talk about your family.", past: "Talk about something you did with your family.", future: "Talk about what you would like to do with your family in the future." },
+  amigos: { present: "Talk about your friends.", past: "Talk about something you did with your friends.", future: "Talk about what you would like to do with your friends soon." },
+  tiempo: { present: "Talk about your free time.", past: "Talk about what you did last weekend.", future: "Talk about what you will do next weekend." },
+  vacaciones: { present: "Talk about holidays and travel.", past: "Talk about your last holiday or trip.", future: "Talk about where you would like to go in the future." },
+  salud: { present: "Talk about sport and health.", past: "Talk about a sport or healthy activity you tried.", future: "Talk about how you will stay healthy in the future." },
+  tecnologia: { present: "Talk about technology and social media.", past: "Talk about your recent use of technology.", future: "Talk about how you will use technology in the future." },
+  comida: { present: "Talk about food and daily life.", past: "Talk about what you ate recently.", future: "Talk about what you would like to eat or do soon." },
+  futuro: { present: "Talk about what matters to you about the future.", past: "Talk about what you wanted to do when you were younger.", future: "Talk about your plans for the future." }
+};
+
+let state = {
+  language: localStorage.getItem("oral_language") || "es",
+  theme: localStorage.getItem("oral_theme") || "yo",
+  tense: localStorage.getItem("oral_tense") || "present",
+  turn: 0,
+  history: [],
+  scores: [],
+  focuses: [],
+  lastAudioUrl: null,
+  bank: null,
+  lastSafeValue: ""
+};
+
+const qEl = document.getElementById("question");
+const aEl = document.getElementById("answer");
+const out = document.getElementById("out");
+const pill = document.getElementById("pill");
+const homeBtn = document.getElementById("homeBtn");
+const readQBtn = document.getElementById("readQ");
+const recordBtn = document.getElementById("recordBtn");
+const submitBtn = document.getElementById("submitBtn");
+const turnNoEl = document.getElementById("turnNo");
+
+if (qEl && aEl) initPlay();
+
+async function initPlay() {
+  hidePill();
+  wireButtonsSafely();
+  lockInputDown(aEl);
+
+  setTurn(1);
+  setQuestion("Loading question…");
+  await loadBank();
+
+  const firstQuestion = getRandomQuestion(state.theme, state.tense);
+  setQuestion(firstQuestion);
+}
+
+function hidePill() {
+  if (!pill) return;
+  pill.textContent = "";
+  pill.style.display = "none";
+}
+
+function setTurn(n) {
+  if (turnNoEl) turnNoEl.textContent = String(n);
+}
+
+function wireButtonsSafely() {
+  if (homeBtn) {
+    homeBtn.addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
   }
-  return audioCtx;
-}
-function beep(freq=440, dur=0.08, type="sine", gain=0.05) {
-  const ctx = ensureAudio();
-  if (!ctx) return;
-  const o = ctx.createOscillator();
-  const g = ctx.createGain();
-  o.type = type;
-  o.frequency.value = freq;
-  g.gain.value = gain;
-  o.connect(g);
-  g.connect(ctx.destination);
-  o.start();
-  o.stop(ctx.currentTime + dur);
-}
-function fanfarePerfect() {
-  if (!state.soundsOn) return;
-  const notes = [523,659,784,1047]; // C5 E5 G5 C6
-  notes.forEach((f,i)=> setTimeout(()=>beep(f,0.11,"triangle",0.055), i*130));
-  setTimeout(()=>beep(988,0.10,"square",0.045), 620);
-}
 
-// --- Speech (TTS) ---
-function speak(text) {
-  if (!state.voiceOn) return;
-  if (!("speechSynthesis" in window)) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.rate = 1.0;
-  u.pitch = 1.0;
-  u.lang = "en-IE";
-  window.speechSynthesis.speak(u);
-}
-
-// --- Dictation (Speech-to-text) ---
-let recognizer = null;
-function canDictate() {
-  return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
-}
-function startDictation() {
-  if (!state.voiceOn) return; // only after request
-  const target = state.lastFocusedInput;
-  if (!target) return;
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return;
-
-  if (recognizer) {
-    try { recognizer.stop(); } catch(e){}
-    recognizer = null;
+  if (readQBtn) {
+    readQBtn.addEventListener("click", () => {
+      speakQuestion(getPlainQuestionText());
+    });
   }
-  recognizer = new SR();
-  recognizer.lang = "es-ES";
-  recognizer.interimResults = false;
-  recognizer.maxAlternatives = 1;
 
-  recognizer.onresult = (event) => {
-    const t = (event.results && event.results[0] && event.results[0][0] && event.results[0][0].transcript ? event.results[0][0].transcript : "").trim();
-    if (t) {
-      target.value = t;
-      target.focus();
-      beep(660,0.07,"sine",0.04);
-    }
-  };
-  recognizer.onerror = () => {
-    // silent fail (keeps game stable)
-  };
+  if (recordBtn) {
+    recordBtn.addEventListener("click", onRecord);
+  }
+
+  if (submitBtn) {
+    submitBtn.addEventListener("click", onSubmit);
+  }
+}
+
+function questionFileForLanguage(lang) {
+  if (lang === "fr") return "questions-fr.json";
+  if (lang === "de") return "questions-de.json";
+  return "questions.json";
+}
+
+function speechLangForLanguage(lang) {
+  if (lang === "fr") return "fr-FR";
+  if (lang === "de") return "de-DE";
+  return "es-ES";
+}
+
+function fallbackQuestion() {
+  if (state.language === "fr") return "Peux-tu parler un peu de ce thème ?";
+  if (state.language === "de") return "Kannst du ein bisschen über dieses Thema sprechen?";
+  return "¿Puedes hablar un poco de este tema?";
+}
+
+function setQuestion(text) {
+  const q = text || fallbackQuestion();
+  const eng = englishHelpForCurrentTheme();
+  qEl.innerHTML = `
+    <div style="font-weight:800; line-height:1.4;">${escapeHtml(q)}</div>
+    <div style="margin-top:6px;font-size:0.92rem;opacity:0.75;line-height:1.35;">
+      ${escapeHtml(eng)}
+    </div>
+  `;
+}
+
+function getPlainQuestionText() {
+  const first = qEl.querySelector("div");
+  return first ? first.textContent : qEl.textContent;
+}
+
+function englishHelpForCurrentTheme() {
+  const block = THEME_ENGLISH[state.theme] || THEME_ENGLISH.yo;
+  return block[state.tense] || block.present || "Say something about this topic.";
+}
+
+async function loadBank() {
+  if (state.bank) return state.bank;
   try {
-    recognizer.start();
-    beep(440,0.06,"sine",0.04);
-  } catch(e){}
-}
-
-// --- Confetti ---
-function confettiPop() {
-  const n = 36;
-  for (let i=0;i<n;i++) {
-    const d = document.createElement("div");
-    d.className = "confetti";
-    d.style.left = (Math.random()*100) + "vw";
-    d.style.transform = "translateY(-12px) rotate(" + (Math.random()*180) + "deg)";
-    const colors = ["#ff6f61","#1abc9c","#6e7fca","#f39c12","#2ecc71","#e74c3c"];
-    d.style.background = colors[Math.floor(Math.random()*colors.length)];
-    d.style.animationDuration = (1.4 + Math.random()*0.9) + "s";
-    document.body.appendChild(d);
-    setTimeout(()=>d.remove(), 2400);
+    const file = questionFileForLanguage(state.language);
+    state.bank = await fetch(file, { cache: "no-store" }).then(r => r.json());
+  } catch {
+    state.bank = {};
   }
+  return state.bank;
 }
 
-// --- Controls bar ---
-function renderControls() {
-  if (!controlsBar) return;
-  controlsBar.innerHTML = "";
-
-  const soundBtn = document.createElement("button");
-  soundBtn.textContent = state.soundsOn ? "🔊 Sounds: ON" : "🔈 Sounds: OFF";
-  soundBtn.className = state.soundsOn ? "on" : "";
-  soundBtn.onclick = () => {
-    state.soundsOn = !state.soundsOn;
-    if (!state.soundsOn) {
-      try { if (audioCtx) audioCtx.close(); } catch(e){}
-      audioCtx = null;
-    } else {
-      beep(523,0.06,"triangle",0.05);
-    }
-    renderControls();
-  };
-
-  const voiceBtn = document.createElement("button");
-  voiceBtn.textContent = state.voiceOn ? "🗣 Voice: ON" : "🗣 Voice: OFF";
-  voiceBtn.className = state.voiceOn ? "on" : "";
-  voiceBtn.onclick = () => {
-    state.voiceOn = !state.voiceOn;
-    if (!state.voiceOn) {
-      try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch(e){}
-    } else {
-      speak("Voice on.");
-    }
-    renderControls();
-  };
-
-  const readBtn = document.createElement("button");
-  readBtn.textContent = "📣 Read questions";
-  readBtn.disabled = !state.voiceOn;
-  readBtn.onclick = () => {
-    if (!state.voiceOn) return;
-    const prompts = gameVerbs.map(v=>v.en);
-    let i=0;
-    const sayNext = () => {
-      if (i>=prompts.length) return;
-      const u = new SpeechSynthesisUtterance(prompts[i]);
-      u.rate = 1.0;
-      u.lang = "en-IE";
-      u.onend = () => { i++; setTimeout(sayNext, 220); };
-      window.speechSynthesis.speak(u);
-    };
-    window.speechSynthesis.cancel();
-    sayNext();
-  };
-
-  const dictateBtn = document.createElement("button");
-  dictateBtn.textContent = "🎙 Dictate (into box)";
-  dictateBtn.disabled = !state.voiceOn || !canDictate();
-  dictateBtn.onclick = () => startDictation();
-
-  const chip = document.createElement("div");
-  chip.className = "chip";
-  chip.append(soundBtn, voiceBtn, readBtn, dictateBtn);
-
-  controlsBar.appendChild(chip);
+function normaliseTheme(theme) {
+  const t = String(theme || "yo").trim().toLowerCase();
+  if (state.bank && state.bank[t]) return t;
+  return "yo";
 }
 
-// --- Tense buttons ---
-tenseButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    tenseButtons.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    currentTense = btn.dataset.tense;
-    beep(523,0.05,"triangle",0.04);
-    renderLevels();
-  });
-});
+function normaliseTense(tense) {
+  const t = String(tense || "present").trim().toLowerCase();
+  return ["present", "past", "future"].includes(t) ? t : "present";
+}
 
-// --- Render levels initially ---
-renderLevels();
+function getQuestionList(theme, tense) {
+  const bank = state.bank || {};
+  const safeTheme = normaliseTheme(theme);
+  const safeTense = normaliseTense(tense);
+  const themeBlock = bank[safeTheme];
 
-function renderLevels() {
-  levelList.style.display = "flex";
-  gameContainer.style.display = "none";
-  levelList.innerHTML = "";
+  if (!themeBlock) return [];
 
-  for (let i = 1; i <= 10; i++) {
-    const button = document.createElement("button");
-    const bestTimeKey = `bestTime_${currentTense}_Level${i}`;
-    const bestTime = localStorage.getItem(bestTimeKey);
-    const locked = i > unlockedLevels[currentTense];
-
-    button.textContent = locked ? `Level ${i} 🔒` : `Level ${i}${bestTime ? ` - Best: ${bestTime}s` : ""}`;
-    button.disabled = locked;
-
-    button.addEventListener("click", () => {
-      beep(659,0.05,"triangle",0.045);
-      startGame(i);
-    });
-
-    levelList.appendChild(button);
+  if (Array.isArray(themeBlock)) {
+    return themeBlock.filter(Boolean);
   }
+
+  const exact = themeBlock[safeTense];
+  if (Array.isArray(exact) && exact.length) {
+    return exact.filter(Boolean);
+  }
+
+  const merged = []
+    .concat(Array.isArray(themeBlock.present) ? themeBlock.present : [])
+    .concat(Array.isArray(themeBlock.past) ? themeBlock.past : [])
+    .concat(Array.isArray(themeBlock.future) ? themeBlock.future : [])
+    .filter(Boolean);
+
+  return merged;
 }
 
-function startGame(level) {
-  currentLevel = level;
-  gameVerbs = shuffleArray([...VERB_SETS[currentTense]]).slice(0, 10);
+function getAnyQuestionFromBank() {
+  const bank = state.bank || {};
+  for (const themeKey of Object.keys(bank)) {
+    const block = bank[themeKey];
 
-  levelList.style.display = "none";
-  gameContainer.style.display = "block";
-  questionsContainer.innerHTML = "";
-  resultsContainer.innerHTML = "";
+    if (Array.isArray(block) && block.length) {
+      return block[Math.floor(Math.random() * block.length)];
+    }
 
-  renderControls();
-
-  gameVerbs.forEach(verb => {
-    const div = document.createElement("div");
-    div.innerHTML = `<strong>${verb.en}</strong>: <input type="text" data-answer="${verb.es}">`;
-    const input = div.querySelector("input");
-    input.addEventListener("focus", ()=> state.lastFocusedInput = input);
-    input.addEventListener("keydown", (e)=> {
-      if (e.key === "Enter") {
-        const inputs = [...document.querySelectorAll("#questions input")];
-        const idx = inputs.indexOf(input);
-        if (idx >= 0 && idx < inputs.length-1) inputs[idx+1].focus();
+    if (block && typeof block === "object") {
+      for (const tenseKey of ["present", "past", "future"]) {
+        const list = block[tenseKey];
+        if (Array.isArray(list) && list.length) {
+          return list[Math.floor(Math.random() * list.length)];
+        }
       }
+    }
+  }
+  return fallbackQuestion();
+}
+
+function getRandomQuestion(theme, tense) {
+  const list = getQuestionList(theme, tense);
+  if (list.length) {
+    return list[Math.floor(Math.random() * list.length)];
+  }
+  return getAnyQuestionFromBank();
+}
+
+function speakQuestion(text) {
+  if (!text) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = speechLangForLanguage(state.language);
+  u.rate = 0.95;
+  const voices = speechSynthesis.getVoices ? speechSynthesis.getVoices() : [];
+  const want = u.lang.toLowerCase();
+  const v =
+    voices.find(x => (x.lang || "").toLowerCase() === want) ||
+    voices.find(x => (x.lang || "").toLowerCase().startsWith(want.slice(0, 2)));
+  if (v) u.voice = v;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+let mediaRecorder = null;
+let audioChunks = [];
+let recordTimeout = null;
+const MAX_RECORDING_MS = 9000;
+const MIN_RECORDING_MS = 2200;
+const SILENCE_GRACE_MS = 1600;
+
+async function onRecord() {
+  if (!recordBtn || !out) return;
+
+  if (state.lastAudioUrl) {
+    URL.revokeObjectURL(state.lastAudioUrl);
+    state.lastAudioUrl = null;
+  }
+
+  out.classList.remove("hidden");
+  out.innerHTML = `
+    <div><strong>Dictation</strong></div>
+    <div class="tiny">Recording… speak naturally. You can pause briefly to think. (Stops automatically.)</div>
+  `;
+
+  audioChunks = [];
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data && e.data.size) audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = async () => {
+      try {
+        stream.getTracks().forEach(t => t.stop());
+      } catch {}
+
+      const blob = new Blob(audioChunks, {
+        type: (audioChunks[0] && audioChunks[0].type) ? audioChunks[0].type : "audio/webm"
+      });
+
+      state.lastAudioUrl = URL.createObjectURL(blob);
+
+      out.innerHTML = `
+        <div><strong>Dictation</strong></div>
+        <div class="tiny">Transcribing…</div>
+      `;
+
+      try {
+        const data = await window.transcribeAudio(blob, state.language);
+        const text = (data && data.text) ? String(data.text).trim() : "";
+        if (!text) {
+          out.innerHTML = `
+            <div><strong>Dictation</strong></div>
+            <div class="tiny">No speech detected. Try again, closer to the mic.</div>
+          `;
+          return;
+        }
+        aEl.value = text;
+        state.lastSafeValue = aEl.value;
+        out.classList.add("hidden");
+      } catch {
+        out.innerHTML = `
+          <div><strong>Dictation</strong></div>
+          <div class="tiny">Transcription failed. Try again.</div>
+        `;
+      }
+    };
+
+    mediaRecorder.start();
+
+    let audioContext = null;
+    let analyser = null;
+    let source = null;
+    let silenceStartedAt = null;
+    let startedAt = Date.now();
+    let rafId = null;
+    const timeData = new Uint8Array(2048);
+
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      source = audioContext.createMediaStreamSource(stream);
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 2048;
+      source.connect(analyser);
+
+      const watchSilence = () => {
+        if (!analyser || !mediaRecorder || mediaRecorder.state === "inactive") return;
+
+        analyser.getByteTimeDomainData(timeData);
+
+        let peak = 0;
+        for (let i = 0; i < timeData.length; i++) {
+          const level = Math.abs(timeData[i] - 128);
+          if (level > peak) peak = level;
+        }
+
+        const elapsed = Date.now() - startedAt;
+        const isSpeaking = peak > 7;
+
+        if (elapsed < MIN_RECORDING_MS) {
+          silenceStartedAt = null;
+        } else if (isSpeaking) {
+          silenceStartedAt = null;
+        } else if (!silenceStartedAt) {
+          silenceStartedAt = Date.now();
+        } else if (Date.now() - silenceStartedAt >= SILENCE_GRACE_MS) {
+          safeStopRecording();
+          return;
+        }
+
+        if (elapsed >= MAX_RECORDING_MS) {
+          safeStopRecording();
+          return;
+        }
+
+        rafId = requestAnimationFrame(watchSilence);
+      };
+
+      watchSilence();
+
+      mediaRecorder.addEventListener("stop", () => {
+        if (rafId) cancelAnimationFrame(rafId);
+        try { if (source) source.disconnect(); } catch {}
+        try { if (analyser) analyser.disconnect(); } catch {}
+        try { if (audioContext && audioContext.state !== "closed") audioContext.close(); } catch {}
+      }, { once: true });
+    } catch {
+      recordTimeout = setTimeout(() => safeStopRecording(), MAX_RECORDING_MS);
+    }
+
+    recordBtn.textContent = "⏹ Stop";
+    recordBtn.onclick = () => safeStopRecording();
+  } catch {
+    out.innerHTML = `
+      <div><strong>Dictation</strong></div>
+      <div class="tiny">Microphone permission denied or unavailable.</div>
+    `;
+  }
+}
+
+function safeStopRecording() {
+  try {
+    if (recordTimeout) clearTimeout(recordTimeout);
+  } catch {}
+  recordTimeout = null;
+
+  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    try { mediaRecorder.stop(); } catch {}
+  }
+
+  if (recordBtn) {
+    recordBtn.textContent = "🎙 Dictate";
+    recordBtn.onclick = onRecord;
+  }
+}
+
+function starsFor(score100) {
+  if (score100 >= 85) return 3;
+  if (score100 >= 70) return 2;
+  if (score100 >= 55) return 1;
+  return 0;
+}
+
+function addTotalStars(n) {
+  const cur = Number(localStorage.getItem(TOTAL_STARS_KEY) || 0);
+  localStorage.setItem(TOTAL_STARS_KEY, String(cur + n));
+}
+
+function updateBest(theme, tense, stars) {
+  const key = `oral_best_${theme}_${tense}`;
+  const cur = Number(localStorage.getItem(key) || 0);
+  if (stars > cur) localStorage.setItem(key, String(stars));
+}
+
+async function onSubmit(e) {
+  if (e) e.preventDefault();
+
+  const answer = aEl.value.trim();
+
+  if (!answer) return;
+
+  const validity = validateTargetLanguageAnswer(answer, state.language);
+
+  if (!validity.ok) {
+    out.classList.remove("hidden");
+    out.innerHTML = `
+      <div style="font-weight:900;font-size:1.1rem;margin-bottom:8px;">Target language only</div>
+      <div style="margin-bottom:8px;">${escapeHtml(validity.message)}</div>
+      <div class="tiny">No English, no keyboard smash, and no pasted text.</div>
+    `;
+    return;
+  }
+
+  if (submitBtn) submitBtn.disabled = true;
+  if (recordBtn) recordBtn.disabled = true;
+
+  out.classList.remove("hidden");
+  out.innerHTML = `<div><strong>Thinking…</strong></div><div class="tiny">Checking your answer.</div>`;
+
+  if (!window.classifyAnswer || typeof window.classifyAnswer !== "function") {
+    out.innerHTML = `
+      <div><strong>Error</strong></div>
+      <div class="tiny">The Worker link is not available on this page.</div>
+    `;
+    if (submitBtn) submitBtn.disabled = false;
+    if (recordBtn) recordBtn.disabled = false;
+    return;
+  }
+
+  const payload = {
+    mode: "jc_oral",
+    language: state.language,
+    theme: state.theme,
+    tense: state.tense,
+    question: getPlainQuestionText(),
+    answer,
+    history: state.history,
+    turn: state.turn + 1,
+    max_turns: MAX_TURNS
+  };
+
+  let result;
+  try {
+    result = await window.classifyAnswer(payload);
+  } catch {
+    result = {
+      score: 0,
+      focus: "communication",
+      feedback: "AI error — try again.",
+      next_question: null,
+      next_tense: state.tense,
+      session_end: false
+    };
+  }
+
+  const score = Number(result.score) || 0;
+  const focus = (result.focus || "communication").toString();
+
+  state.turn += 1;
+  state.scores.push(score);
+  state.focuses.push(focus);
+  state.history.push({ q: getPlainQuestionText(), a: answer, tense: state.tense });
+
+  const outOf10 = Math.max(0, Math.min(10, Math.round(score / 10)));
+  const starCount = starsFor(score);
+  const stars = "⭐".repeat(starCount);
+  const prevScore = state.scores.length > 1 ? state.scores[state.scores.length - 2] : null;
+
+  let progressLine = "";
+  if (prevScore !== null) {
+    if (score > prevScore) progressLine = `<div style="margin-bottom:10px;font-weight:800;">⬆️ Nice improvement.</div>`;
+    else if (score < prevScore) progressLine = `<div style="margin-bottom:10px;font-weight:800;">⚠️ A bit weaker this time — something is lacking.</div>`;
+    else progressLine = `<div style="margin-bottom:10px;font-weight:800;">➡️ Steady. One small upgrade now.</div>`;
+  }
+
+  let coachLine = "";
+  if (outOf10 >= 8) {
+    coachLine = "Strong answer. Don’t waste too much time chasing one extra mark here. Improve another area too.";
+  } else if (outOf10 >= 6) {
+    coachLine = "Good base. One clear fix will move this up.";
+  } else {
+    coachLine = "Something important is lacking, but it is very fixable.";
+  }
+
+  out.innerHTML = `
+    <div style="font-weight:900;font-size:1.3rem;margin-bottom:6px;">${outOf10}/10 ${stars}</div>
+    ${progressLine}
+    <div style="margin-bottom:10px;"><strong>Main mark-losing issue:</strong> ${escapeHtml(focus)}</div>
+    <div style="margin-bottom:10px;"><strong>Coach note:</strong> ${escapeHtml(coachLine)}</div>
+    <div style="margin-bottom:12px;">${escapeHtml(result.feedback || "—").replace(/\n/g, "<br>")}</div>
+    ${result.model_answer ? `<div style="margin-top:10px;"><strong>Model:</strong><br>${escapeHtml(result.model_answer).replace(/\n/g, "<br>")}</div>` : ""}
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button id="nextBtn" type="button">Next</button>
+      <button id="readFeedbackBtn" class="smallBtn" type="button">🔊 Read Question</button>
+    </div>
+  `;
+
+  setTurn(Math.min(state.turn + 1, MAX_TURNS));
+
+  const readFeedbackBtn = document.getElementById("readFeedbackBtn");
+  if (readFeedbackBtn) {
+    readFeedbackBtn.addEventListener("click", () => speakQuestion(getPlainQuestionText()));
+  }
+
+  const nextBtn = document.getElementById("nextBtn");
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      if (result.session_end || state.turn >= MAX_TURNS) {
+        renderSummary(result);
+        return;
+      }
+
+      const nextTense = (result.next_tense || state.tense).toString();
+      state.tense = ["past", "future", "present"].includes(nextTense) ? nextTense : state.tense;
+
+      hidePill();
+
+      if (result.next_question && String(result.next_question).trim()) {
+        setQuestion(String(result.next_question).trim());
+      } else {
+        setQuestion(getRandomQuestion(state.theme, state.tense));
+      }
+
+      aEl.value = "";
+      state.lastSafeValue = "";
+      out.classList.add("hidden");
+      if (submitBtn) submitBtn.disabled = false;
+      if (recordBtn) recordBtn.disabled = false;
     });
-    questionsContainer.appendChild(div);
+  }
+}
+
+function renderSummary(result) {
+  const avg = Math.round(state.scores.reduce((a, b) => a + b, 0) / Math.max(1, state.scores.length));
+  const sessionStars = starsFor(avg);
+  addTotalStars(sessionStars);
+  updateBest(state.theme, state.tense, sessionStars);
+
+  const counts = {};
+  state.focuses.forEach(f => {
+    const k = (f || "").trim();
+    if (!k) return;
+    counts[k] = (counts[k] || 0) + 1;
   });
 
-  startTimer();
-  if (state.soundsOn) beep(392,0.07,"sine",0.035);
-}
-
-function shuffleArray(array) {
-  return array.sort(() => Math.random() - 0.5);
-}
-
-function startTimer() {
-  startTime = Date.now();
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - startTime) / 1000);
-    document.getElementById("timer").textContent = `Time: ${elapsed}s`;
-  }, 1000);
-}
-
-function stopTimer() {
-  clearInterval(timerInterval);
-}
-
-function checkAnswers(evt) {
-  if (evt && evt.preventDefault) evt.preventDefault();
-
-  stopTimer();
-  const elapsed = Math.floor((Date.now() - startTime) / 1000);
-
-  let penalty = 0;
-  let correct = 0;
-
-  document.querySelectorAll("#questions input").forEach(input => {
-    const expected = (input.dataset.answer || "").trim().toLowerCase();
-    const got = (input.value || "").trim().toLowerCase();
-    if (got === expected) {
-      correct++;
-      input.style.border = "2px solid #16a34a";
-      if (state.soundsOn) beep(784,0.035,"sine",0.03);
-    } else {
-      penalty += 30;
-      input.style.border = "2px solid #dc2626";
-      if (state.soundsOn) beep(220,0.05,"sawtooth",0.02);
+  let main = "—";
+  let best = 0;
+  Object.keys(counts).forEach(k => {
+    if (counts[k] > best) {
+      best = counts[k];
+      main = k;
     }
   });
 
-  const totalTime = elapsed + penalty;
-  resultsContainer.innerHTML =
-    `<h3>Game Over!</h3>
-     <p><strong>Correct:</strong> ${correct}/10</p>
-     <p><strong>Time:</strong> ${elapsed}s + <strong>Penalty:</strong> ${penalty}s = <strong>${totalTime}s</strong></p>
-     <h4>Feedback:</h4>`;
+  const drills = Array.isArray(result?.drills) ? result.drills : [];
+  const avg10 = Math.max(0, Math.min(10, Math.round(avg / 10)));
 
-  document.querySelectorAll("#questions input").forEach(input => {
-    const correctAnswer = (input.dataset.answer || "").trim();
-    const userAnswer = (input.value || "").trim();
-    if (userAnswer.toLowerCase() !== correctAnswer.toLowerCase()) {
-      const feedback = document.createElement("p");
-      const prompt = input.parentElement.querySelector("strong").textContent;
-      feedback.innerHTML = `<strong>${prompt}</strong> → Correct: <span style='color:#16a34a;'>${correctAnswer}</span> | You: <span style='color:#dc2626;'>${userAnswer || "(blank)"}</span>`;
-      resultsContainer.appendChild(feedback);
+  out.classList.remove("hidden");
+  out.innerHTML = `
+    <h2 style="margin-top:0;">Session Complete</h2>
+    <div style="font-weight:900;font-size:1.8rem;margin:8px 0;">${avg10}/10 ${"⭐".repeat(sessionStars)}</div>
+    <div class="tiny">Turns: ${state.turn}/${MAX_TURNS}</div>
+    <div style="margin-top:12px;"><strong>Your main mark-losing issue today:</strong> ${escapeHtml(main)}</div>
+    <div style="margin-top:10px;"><strong>What to do next:</strong>
+      <ul style="margin:8px 0 0 18px;">
+        ${(drills.length ? drills : [
+          "Add 1 reason or 1 small detail to each answer.",
+          "Use one connector.",
+          "Repeat the same theme and try to beat your last round."
+        ]).map(d => `<li>${escapeHtml(String(d))}</li>`).join("")}
+      </ul>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button id="againBtn" type="button">Play Again</button>
+      <button id="homeBtn2" class="ghost" type="button">Back to Themes</button>
+    </div>
+  `;
+
+  const againBtn = document.getElementById("againBtn");
+  if (againBtn) {
+    againBtn.addEventListener("click", () => {
+      const keepTheme = state.theme;
+      const keepTense = state.tense;
+      const keepLanguage = state.language;
+      state = {
+        language: keepLanguage,
+        theme: keepTheme,
+        tense: keepTense,
+        turn: 0,
+        history: [],
+        scores: [],
+        focuses: [],
+        lastAudioUrl: null,
+        bank: state.bank,
+        lastSafeValue: ""
+      };
+      hidePill();
+      setTurn(1);
+      aEl.value = "";
+      out.classList.add("hidden");
+      if (submitBtn) submitBtn.disabled = false;
+      if (recordBtn) recordBtn.disabled = false;
+      setQuestion(getRandomQuestion(state.theme, state.tense));
+    });
+  }
+
+  const homeBtn2 = document.getElementById("homeBtn2");
+  if (homeBtn2) {
+    homeBtn2.addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+  }
+
+  if (submitBtn) submitBtn.disabled = true;
+  if (recordBtn) recordBtn.disabled = false;
+}
+
+function validateTargetLanguageAnswer(answer, lang) {
+  const s = String(answer || "").trim();
+  const lower = s.toLowerCase();
+
+  if (s.length < 3) {
+    return { ok: false, message: "That is too short." };
+  }
+
+  if (!/[a-zA-ZÀ-ÿÄÖÜäöüßñÑçÇ]/.test(s)) {
+    return { ok: false, message: "That does not look like a real answer." };
+  }
+
+  if (looksLikeKeyboardSmash(lower)) {
+    return { ok: false, message: "That looks like keyboard smash, not a real answer." };
+  }
+
+  if (lang === "es" && looksEnglishNotSpanish(lower)) {
+    return { ok: false, message: "Please answer in Spanish only." };
+  }
+
+  if (lang === "fr" && looksEnglishNotFrench(lower)) {
+    return { ok: false, message: "Please answer in French only." };
+  }
+
+  if (lang === "de" && looksEnglishNotGerman(lower)) {
+    return { ok: false, message: "Please answer in German only." };
+  }
+
+  if (lang === "es" && !hasSpanishSignal(lower)) {
+    return { ok: false, message: "That does not look Spanish enough." };
+  }
+
+  if (lang === "fr" && !hasFrenchSignal(lower)) {
+    return { ok: false, message: "That does not look French enough." };
+  }
+
+  if (lang === "de" && !hasGermanSignal(lower)) {
+    return { ok: false, message: "That does not look German enough." };
+  }
+
+  return { ok: true, message: "" };
+}
+
+function looksLikeKeyboardSmash(s) {
+  if (s.length >= 6 && !/[aeiouáéíóúàèìòùâêîôûäëïöüy]/i.test(s)) return true;
+  if (/([a-záéíóúàèìòùâêîôûäëïöüß])\1\1/i.test(s)) return true;
+  if (/^[a-z]{7,}$/i.test(s) && !/\s/.test(s) && !/[aeiouáéíóúàèìòùâêîôûäëïöü]/i.test(s)) return true;
+  return false;
+}
+
+function looksEnglishNotSpanish(s) {
+  const english = /\b(i|my|me|and|the|is|are|live|like|love|have|go|went|with|because|but|in|on|at|family|school|friend|friends)\b/;
+  const spanish = /\b(yo|me|mi|mis|soy|es|son|tengo|vivo|estoy|voy|fui|porque|pero|con|mi familia|mis amigos|instituto|colegio|me gusta|también)\b|[ñáéíóúü]/;
+  return english.test(s) && !spanish.test(s);
+}
+
+function looksEnglishNotFrench(s) {
+  const english = /\b(i|my|me|and|the|is|are|live|like|love|have|go|went|with|because|but|in|on|at|family|school|friend|friends)\b/;
+  const french = /\b(je|j'|moi|mon|ma|mes|suis|ai|habite|vais|parce que|mais|avec|famille|école|amis|j'aime|aussi|dans|c'est)\b|[àâçéèêëîïôùûüÿœ]/;
+  return english.test(s) && !french.test(s);
+}
+
+function looksEnglishNotGerman(s) {
+  const english = /\b(i|my|me|and|the|is|are|live|like|love|have|go|went|with|because|but|in|on|at|family|school|friend|friends)\b/;
+  const german = /\b(ich|mein|meine|bin|habe|wohne|gehe|ging|weil|aber|mit|familie|schule|freunde|mag|auch|und|in der|zu hause)\b|[äöüß]/;
+  return english.test(s) && !german.test(s);
+}
+
+function hasSpanishSignal(s) {
+  return /\b(yo|me|mi|mis|soy|es|son|tengo|vivo|estoy|voy|fui|porque|pero|con|familia|amigos|instituto|colegio|me gusta|también|muy|en|de|un|una)\b|[ñáéíóúü]/.test(s);
+}
+
+function hasFrenchSignal(s) {
+  return /\b(je|j'|moi|mon|ma|mes|suis|ai|habite|vais|parce que|mais|avec|famille|école|amis|j'aime|aussi|très|dans|de|un|une|le|la|les|c'est)\b|[àâçéèêëîïôùûüÿœ]/.test(s);
+}
+
+function hasGermanSignal(s) {
+  return /\b(ich|mein|meine|bin|habe|wohne|gehe|ging|weil|aber|mit|familie|schule|freunde|mag|auch|sehr|und|ein|eine|der|die|das|zu hause)\b|[äöüß]/.test(s);
+}
+
+function lockInputDown(el) {
+  if (!el) return;
+
+  state.lastSafeValue = el.value || "";
+
+  ["paste", "copy", "cut", "drop", "contextmenu"].forEach(evt => {
+    el.addEventListener(evt, e => e.preventDefault());
+  });
+
+  document.addEventListener("copy", e => {
+    if (document.activeElement === el) e.preventDefault();
+  });
+
+  document.addEventListener("cut", e => {
+    if (document.activeElement === el) e.preventDefault();
+  });
+
+  el.addEventListener("beforeinput", e => {
+    const blocked = [
+      "insertFromPaste",
+      "insertFromDrop",
+      "deleteByCut",
+      "historyUndo",
+      "historyRedo"
+    ];
+    if (blocked.includes(e.inputType)) e.preventDefault();
+  });
+
+  el.addEventListener("keydown", e => {
+    const key = (e.key || "").toLowerCase();
+    if ((e.ctrlKey || e.metaKey) && ["v", "c", "x", "a"].includes(key)) {
+      e.preventDefault();
     }
   });
 
-  const bestTimeKey = `bestTime_${currentTense}_Level${currentLevel}`;
-  const savedBestTime = localStorage.getItem(bestTimeKey);
-  if (!savedBestTime || totalTime < parseInt(savedBestTime)) {
-    localStorage.setItem(bestTimeKey, totalTime);
-  }
+  el.addEventListener("input", () => {
+    state.lastSafeValue = el.value;
+  });
 
-  if (totalTime <= levelUnlockTime(currentLevel)) {
-    if (unlockedLevels[currentTense] < currentLevel + 1) {
-      unlockedLevels[currentTense] = currentLevel + 1;
-      const unlockMsg = document.createElement("p");
-      unlockMsg.style.color = "#2563eb";
-      unlockMsg.innerHTML = `<strong>Level ${currentLevel + 1} Unlocked!</strong> 🏆`;
-      resultsContainer.appendChild(unlockMsg);
-      if (state.soundsOn) beep(988,0.08,"triangle",0.05);
-    }
-  }
-
-  if (correct === 10) {
-    const celebration = document.createElement("div");
-    celebration.className = "perfect-celebration";
-    celebration.textContent = "🎉 PERFECT GAME! 🎉";
-    resultsContainer.prepend(celebration);
-
-    confettiPop();
-    fanfarePerfect();
-
-    setTimeout(() => celebration.remove(), 5000);
-  }
-
-  const tryAgainButton = document.createElement("button");
-  tryAgainButton.textContent = "Try Again";
-  tryAgainButton.className = "try-again";
-  tryAgainButton.onclick = () => {
-    beep(659,0.05,"triangle",0.045);
-    startGame(currentLevel);
-  };
-  resultsContainer.appendChild(tryAgainButton);
-
-  const backButton = document.createElement("button");
-  backButton.textContent = "Back to Levels";
-  backButton.id = "back-button";
-  backButton.onclick = () => {
-    beep(523,0.05,"triangle",0.04);
-    renderLevels();
-  };
-  resultsContainer.appendChild(backButton);
-
-  resultsContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+  el.addEventListener("selectstart", e => e.preventDefault());
 }
 
-function levelUnlockTime(level) {
-  return 100 - (level - 1) * 5;
+function escapeHtml(s) {
+  return String(s)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
-
-// Submit: attach + global safety hook
-if (submitBtn) {
-  submitBtn.addEventListener("click", checkAnswers);
-}
-window.checkAnswers = checkAnswers;
