@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Turbo Me (up)</title>
+  <title>Turbooooooo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -10,30 +10,20 @@
 
 <main class="wrap playWrap">
   <div class="topBar">
-    <button id="homeBtn" class="ghost" type="button">← Themes</button>
-    <div class="pill" id="pill">Theme · Tense</div>
+    <button id="homeBtn" class="ghost" type="button">← Levels</button>
+    <div class="pill" id="pill">Level</div>
   </div>
 
-  <h1>Turbo Me (up)</h1>
-  <div class="turnLine">Turn <span id="turnNo">1</span>/3</div>
+  <h1>Turbooooooo</h1>
+  <div class="turnLine">Question <span id="turnNo">1</span>/10</div>
 
   <div class="taskBox taskBoxSolo">
     <span id="question">Loading question…</span>
-    <button id="readQ" class="smallBtn" type="button">🔊</button>
   </div>
 
-  <textarea
-    id="answer"
-    autocomplete="off"
-    autocorrect="off"
-    autocapitalize="off"
-    spellcheck="false"
-    placeholder="Speak (🎙) or type your answer…"
-  ></textarea>
-
-  <div class="controls">
-    <button id="recordBtn" class="smallBtn" type="button">🎙 Dictate</button>
-    <button id="submitBtn" type="button">Submit</button>
+  <div class="controls" style="justify-content:center;">
+    <button id="serBtn" type="button">SER</button>
+    <button id="estarBtn" class="smallBtn" type="button">ESTAR</button>
   </div>
 
   <section id="out" class="card hidden"></section>
@@ -41,60 +31,6 @@
 
 <footer>© 2026 Synge St Games — imagination and perseverance</footer>
 
-<script>
-  const WORKER_URL = "https://royal-butterfly-00d8.seansynge.workers.dev";
-
-  window.classifyAnswer = async function (payload) {
-    const res = await fetch(WORKER_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const text = await res.text();
-
-    if (!res.ok) {
-      console.error("Worker HTTP error:", res.status, text);
-      throw new Error("Worker request failed");
-    }
-
-    try {
-      return JSON.parse(text);
-    } catch (err) {
-      console.error("Worker JSON parse error:", text);
-      throw new Error("Worker returned invalid JSON");
-    }
-  };
-
-  window.transcribeAudio = async function (blob, language = "es") {
-    const fd = new FormData();
-    fd.append("audio", blob, "speech.webm");
-    fd.append("language", language);
-
-    const res = await fetch(`${WORKER_URL}/transcribe`, {
-      method: "POST",
-      body: fd
-    });
-
-    const text = await res.text();
-
-    if (!res.ok) {
-      console.error("Transcribe HTTP error:", res.status, text);
-      throw new Error("Transcription failed");
-    }
-
-    try {
-      return JSON.parse(text);
-    } catch (err) {
-      console.error("Transcribe JSON parse error:", text);
-      throw new Error("Transcription returned invalid JSON");
-    }
-  };
-</script>
-
 <script src="script.js"></script>
-
 </body>
 </html>

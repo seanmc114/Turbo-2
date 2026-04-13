@@ -1,758 +1,397 @@
-const MAX_TURNS = 3;
-const TOTAL_STARS_KEY = "oral_totalStars";
+const LEVELS = [
+  {
+    id: 1,
+    title: "Level 1",
+    subtitle: "Imperfect • SER basics",
+    icon: "🟦",
+    prompts: [
+      { q: "When I was younger, I ___ very shy. (characteristic)", a: "ser", tip: "SER: characteristic in the past" },
+      { q: "My grandfather ___ a doctor. (occupation)", a: "ser", tip: "SER: occupation in the past" },
+      { q: "It ___ Monday. (day/date)", a: "ser", tip: "SER: day/date in the past" },
+      { q: "At that time, they ___ from Galway. (origin)", a: "ser", tip: "SER: origin in the past" },
+      { q: "She ___ my best friend in primary school. (relationship)", a: "ser", tip: "SER: relationship in the past" },
+      { q: "As a child, I ___ very quiet. (characteristic)", a: "ser", tip: "SER: characteristic in the past" },
+      { q: "It ___ two o’clock. (time)", a: "ser", tip: "SER: time in the past" },
+      { q: "My aunt ___ a teacher for years. (occupation)", a: "ser", tip: "SER: occupation in the past" },
+      { q: "Back then, we ___ cousins and classmates. (relationship)", a: "ser", tip: "SER: relationship in the past" },
+      { q: "When he was young, he ___ very funny. (characteristic)", a: "ser", tip: "SER: characteristic in the past" }
+    ]
+  },
+  {
+    id: 2,
+    title: "Level 2",
+    subtitle: "Imperfect • ESTAR basics",
+    icon: "🟩",
+    prompts: [
+      { q: "Yesterday I ___ very tired. (condition)", a: "estar", tip: "ESTAR: condition in the past" },
+      { q: "We ___ at home all evening. (location)", a: "estar", tip: "ESTAR: location in the past" },
+      { q: "She ___ nervous before the exam. (emotion)", a: "estar", tip: "ESTAR: emotion in the past" },
+      { q: "The book ___ on the table. (position)", a: "estar", tip: "ESTAR: position in the past" },
+      { q: "At that moment, they ___ studying. (action)", a: "estar", tip: "ESTAR: ongoing action in the past" },
+      { q: "He ___ ill for a week. (condition)", a: "estar", tip: "ESTAR: temporary state in the past" },
+      { q: "I ___ in Dublin last weekend. (location)", a: "estar", tip: "ESTAR: location in the past" },
+      { q: "You ___ in a bad mood yesterday. (emotion)", a: "estar", tip: "ESTAR: mood in the past" },
+      { q: "The door ___ closed. (condition)", a: "estar", tip: "ESTAR: state/condition in the past" },
+      { q: "We ___ sitting near the window. (position/action)", a: "estar", tip: "ESTAR: position/action in the past" }
+    ]
+  },
+  {
+    id: 3,
+    title: "Level 3",
+    subtitle: "Imperfect • Mixed",
+    icon: "⏳",
+    prompts: [
+      { q: "When I was younger, I ___ very sporty.", a: "ser", tip: "SER: characteristic in the past" },
+      { q: "Yesterday we ___ exhausted after training.", a: "estar", tip: "ESTAR: condition in the past" },
+      { q: "My mother ___ a nurse.", a: "ser", tip: "SER: occupation in the past" },
+      { q: "At six o’clock, I ___ in the kitchen.", a: "estar", tip: "ESTAR: location in the past" },
+      { q: "It ___ Friday and we were happy.", a: "ser", tip: "SER: day/date in the past" },
+      { q: "She ___ angry because of the delay.", a: "estar", tip: "ESTAR: emotion in the past" },
+      { q: "He ___ my neighbour for years.", a: "ser", tip: "SER: relationship/identity in the past" },
+      { q: "The children ___ playing outside.", a: "estar", tip: "ESTAR: action in the past" },
+      { q: "At that time, they ___ from Cork.", a: "ser", tip: "SER: origin in the past" },
+      { q: "The keys ___ under the sofa.", a: "estar", tip: "ESTAR: position/location in the past" }
+    ]
+  },
+  {
+    id: 4,
+    title: "Level 4",
+    subtitle: "Preterite • Mixed",
+    icon: "⚡",
+    prompts: [
+      { q: "The match ___ fantastic. (event quality)", a: "ser", tip: "SER: what the event was like overall" },
+      { q: "I ___ very nervous before the match. (emotion)", a: "estar", tip: "ESTAR: temporary feeling" },
+      { q: "The concert ___ in the stadium. (event location)", a: "ser", tip: "SER: event location" },
+      { q: "My friends ___ in the stadium too. (actual location)", a: "estar", tip: "ESTAR: actual location" },
+      { q: "The film ___ boring. (overall quality)", a: "ser", tip: "SER: defining quality of the film" },
+      { q: "We ___ bored during the film. (state)", a: "estar", tip: "ESTAR: temporary state" },
+      { q: "Yesterday it ___ three o’clock when she arrived. (time)", a: "ser", tip: "SER: time in the past" },
+      { q: "He ___ sick for two days. (condition)", a: "estar", tip: "ESTAR: condition in the past" },
+      { q: "The wedding ___ on the beach. (event location)", a: "ser", tip: "SER: event location" },
+      { q: "I ___ on the beach all afternoon. (location)", a: "estar", tip: "ESTAR: actual location" }
+    ]
+  },
+  {
+    id: 5,
+    title: "Level 5",
+    subtitle: "Event vs location traps",
+    icon: "🎯",
+    prompts: [
+      { q: "The party ___ at Ana’s house. (event location)", a: "ser", tip: "SER: where the event took place" },
+      { q: "The guests ___ at Ana’s house. (actual location)", a: "estar", tip: "ESTAR: where people were" },
+      { q: "The meeting ___ in room 12. (event location)", a: "ser", tip: "SER: event location" },
+      { q: "The students ___ in room 12. (actual location)", a: "estar", tip: "ESTAR: actual location" },
+      { q: "The class ___ on Monday. (day/date)", a: "ser", tip: "SER: day/date" },
+      { q: "The teacher ___ in school early. (location)", a: "estar", tip: "ESTAR: location" },
+      { q: "The ceremony ___ in the church. (event location)", a: "ser", tip: "SER: event location" },
+      { q: "We ___ in the church for an hour. (location)", a: "estar", tip: "ESTAR: actual location" },
+      { q: "The exam ___ at nine o’clock. (time)", a: "ser", tip: "SER: time" },
+      { q: "I ___ outside the room waiting. (location)", a: "estar", tip: "ESTAR: actual location" }
+    ]
+  },
+  {
+    id: 6,
+    title: "Level 6",
+    subtitle: "Adjective / state traps",
+    icon: "🧠",
+    prompts: [
+      { q: "As a child, she ___ very quiet. (characteristic)", a: "ser", tip: "SER: lasting quality" },
+      { q: "Yesterday she ___ quiet because she was upset. (state)", a: "estar", tip: "ESTAR: temporary state" },
+      { q: "My uncle ___ boring as a teacher. (defining quality)", a: "ser", tip: "SER: defining quality" },
+      { q: "We ___ bored in his class. (state)", a: "estar", tip: "ESTAR: temporary state" },
+      { q: "The town ___ small but beautiful. (characteristic)", a: "ser", tip: "SER: characteristic" },
+      { q: "The town ___ very busy during the festival. (state)", a: "estar", tip: "ESTAR: temporary condition" },
+      { q: "My cousin ___ very serious at school. (characteristic)", a: "ser", tip: "SER: personality/quality" },
+      { q: "He ___ serious after the accident. (state)", a: "estar", tip: "ESTAR: condition/state" },
+      { q: "The homework ___ difficult. (defining quality)", a: "ser", tip: "SER: what it was like" },
+      { q: "I ___ frustrated while doing it. (emotion)", a: "estar", tip: "ESTAR: temporary emotion" }
+    ]
+  },
+  {
+    id: 7,
+    title: "Level 7",
+    subtitle: "Exam-style mixed past",
+    icon: "📝",
+    prompts: [
+      { q: "Last year my father ___ unemployed for a few months. (state)", a: "estar", tip: "ESTAR: temporary state" },
+      { q: "When she was young, she ___ very generous. (characteristic)", a: "ser", tip: "SER: characteristic" },
+      { q: "The festival ___ in July every year. (date/time)", a: "ser", tip: "SER: date/time of event" },
+      { q: "Yesterday we ___ at my grandparents’ house. (location)", a: "estar", tip: "ESTAR: actual location" },
+      { q: "My grandmother ___ a dentist. (occupation)", a: "ser", tip: "SER: occupation" },
+      { q: "I ___ delighted with my results. (emotion)", a: "estar", tip: "ESTAR: temporary feeling" },
+      { q: "It ___ my birthday. (identity/day)", a: "ser", tip: "SER: identifying occasion/day" },
+      { q: "The sandwiches ___ on the kitchen table. (position)", a: "estar", tip: "ESTAR: position" },
+      { q: "Back then, they ___ our neighbours. (relationship/identity)", a: "ser", tip: "SER: identity/relationship" },
+      { q: "At that moment, we ___ chatting in the garden. (action)", a: "estar", tip: "ESTAR: action in progress" }
+    ]
+  },
+  {
+    id: 8,
+    title: "Level 8",
+    subtitle: "Boss level • all traps",
+    icon: "👑",
+    prompts: [
+      { q: "The show ___ amazing, but I ___ exhausted afterwards. (choose the FIRST blank)", a: "ser", tip: "FIRST blank = SER: event quality" },
+      { q: "The guests ___ in the hall, but the wedding ___ in the garden. (choose the FIRST blank)", a: "estar", tip: "FIRST blank = ESTAR: actual location" },
+      { q: "When I was younger, I ___ shy, but yesterday I ___ nervous before the interview. (choose the FIRST blank)", a: "ser", tip: "FIRST blank = SER: characteristic" },
+      { q: "The class ___ on Tuesday, and we ___ in room 5. (choose the FIRST blank)", a: "ser", tip: "FIRST blank = SER: day/date" },
+      { q: "My brother ___ a chef, but last week he ___ ill. (choose the FIRST blank)", a: "ser", tip: "FIRST blank = SER: occupation" },
+      { q: "The concert ___ in Dublin, and we ___ near the stage. (choose the FIRST blank)", a: "ser", tip: "FIRST blank = SER: event location" },
+      { q: "My cousins ___ from Spain, but they ___ in Ireland for the summer. (choose the FIRST blank)", a: "ser", tip: "FIRST blank = SER: origin" },
+      { q: "The lesson ___ difficult, and I ___ confused. (choose the FIRST blank)", a: "ser", tip: "FIRST blank = SER: what the lesson was like" },
+      { q: "At that moment, she ___ in the library, but normally she ___ very cheerful. (choose the FIRST blank)", a: "estar", tip: "FIRST blank = ESTAR: location" },
+      { q: "It ___ two o’clock, and everyone ___ ready to leave. (choose the FIRST blank)", a: "ser", tip: "FIRST blank = SER: time" }
+    ]
+  }
+];
 
-const THEME_LABEL = {
-  yo: "Yo y mi personalidad",
-  barrio: "Mi barrio y mi casa",
-  instituto: "Mi instituto",
-  familia: "Mi familia",
-  amigos: "Mis amigos",
-  tiempo: "Tiempo libre",
-  vacaciones: "Vacaciones y viajes",
-  salud: "Deporte y salud",
-  tecnologia: "Tecnología y redes",
-  comida: "Comida y vida diaria",
-  futuro: "Planes y futuro"
-};
+const STORAGE_UNLOCKED = "turbooooooo_past_unlocked";
+const STORAGE_BEST_PREFIX = "turbooooooo_past_best_";
+const STORAGE_CLEARED = "turbooooooo_past_cleared";
 
-const THEME_ENGLISH = {
-  yo: { present: "Talk about yourself and what kind of person you are.", past: "Talk about what you were like when you were younger.", future: "Talk about the kind of person you want to be in the future." },
-  barrio: { present: "Talk about your area and your home.", past: "Talk about where you lived before.", future: "Talk about where you would like to live in the future." },
-  instituto: { present: "Talk about your school.", past: "Talk about a recent day at school.", future: "Talk about school plans for the future." },
-  familia: { present: "Talk about your family.", past: "Talk about something you did with your family.", future: "Talk about what you would like to do with your family in the future." },
-  amigos: { present: "Talk about your friends.", past: "Talk about something you did with your friends.", future: "Talk about what you would like to do with your friends soon." },
-  tiempo: { present: "Talk about your free time.", past: "Talk about what you did last weekend.", future: "Talk about what you will do next weekend." },
-  vacaciones: { present: "Talk about holidays and travel.", past: "Talk about your last holiday or trip.", future: "Talk about where you would like to go in the future." },
-  salud: { present: "Talk about sport and health.", past: "Talk about a sport or healthy activity you tried.", future: "Talk about how you will stay healthy in the future." },
-  tecnologia: { present: "Talk about technology and social media.", past: "Talk about your recent use of technology.", future: "Talk about how you will use technology in the future." },
-  comida: { present: "Talk about food and daily life.", past: "Talk about what you ate recently.", future: "Talk about what you would like to eat or do soon." },
-  futuro: { present: "Talk about what matters to you about the future.", past: "Talk about what you wanted to do when you were younger.", future: "Talk about your plans for the future." }
-};
+const path = location.pathname.split("/").pop() || "index.html";
+const isHome = path === "index.html" || path === "";
+const isPlay = path === "play.html";
 
 let state = {
-  language: localStorage.getItem("oral_language") || "es",
-  theme: localStorage.getItem("oral_theme") || "yo",
-  tense: localStorage.getItem("oral_tense") || "present",
-  turn: 0,
-  history: [],
-  scores: [],
-  focuses: [],
-  lastAudioUrl: null,
-  bank: null,
-  lastSafeValue: ""
+  unlocked: Number(localStorage.getItem(STORAGE_UNLOCKED) || 1),
+  currentLevel: Number(localStorage.getItem("turbooooooo_current_level") || 1),
+  round: [],
+  idx: 0,
+  correct: 0,
+  startMs: 0,
+  timerInt: null,
+  accepting: false
 };
 
-const qEl = document.getElementById("question");
-const aEl = document.getElementById("answer");
-const out = document.getElementById("out");
-const pill = document.getElementById("pill");
-const homeBtn = document.getElementById("homeBtn");
-const readQBtn = document.getElementById("readQ");
-const recordBtn = document.getElementById("recordBtn");
-const submitBtn = document.getElementById("submitBtn");
-const turnNoEl = document.getElementById("turnNo");
-
-if (qEl && aEl) initPlay();
-
-async function initPlay() {
-  hidePill();
-  wireButtonsSafely();
-  lockInputDown(aEl);
-
-  setTurn(1);
-  setQuestion("Loading question…");
-  await loadBank();
-
-  const firstQuestion = getRandomQuestion(state.theme, state.tense);
-  setQuestion(firstQuestion);
+function getBest(levelId){
+  const v = localStorage.getItem(STORAGE_BEST_PREFIX + levelId);
+  return v ? Number(v) : 0;
 }
-
-function hidePill() {
-  if (!pill) return;
-  pill.textContent = "";
-  pill.style.display = "none";
+function setBest(levelId, value){
+  localStorage.setItem(STORAGE_BEST_PREFIX + levelId, String(value));
 }
-
-function setTurn(n) {
-  if (turnNoEl) turnNoEl.textContent = String(n);
+function formatTime(sec){
+  return sec ? sec.toFixed(1) + "s" : "—";
 }
+function shuffle(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function playTone(freq=440, duration=0.12, type="triangle", gainValue=0.03, delay=0){
+  try{
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!playTone.ctx) playTone.ctx = new Ctx();
+    const ctx = playTone.ctx;
+    if(ctx.state === "suspended") ctx.resume();
+    const now = ctx.currentTime + delay;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, now);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(gainValue, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(now); osc.stop(now + duration + 0.02);
+  }catch{}
+}
+function toneGood(){ playTone(660,0.08,"triangle",0.03,0); playTone(880,0.1,"triangle",0.03,0.08); }
+function toneBad(){ playTone(220,0.1,"sawtooth",0.02,0); playTone(180,0.15,"sawtooth",0.02,0.08); }
+function toneStart(){ playTone(392,0.1,"triangle",0.025,0); playTone(523,0.12,"triangle",0.03,0.08); }
+function toneWin(){ playTone(523,0.08,"triangle",0.03,0); playTone(659,0.08,"triangle",0.03,0.08); playTone(784,0.12,"triangle",0.035,0.16); }
 
-function wireButtonsSafely() {
-  if (homeBtn) {
-    homeBtn.addEventListener("click", () => {
-      window.location.href = "index.html";
+function launchConfetti(){
+  for(let i=0;i<24;i++){
+    const p = document.createElement("div");
+    p.style.position = "fixed";
+    p.style.left = (Math.random() * 100) + "vw";
+    p.style.top = "-20px";
+    p.style.width = "10px";
+    p.style.height = "14px";
+    p.style.borderRadius = "3px";
+    p.style.background = i % 2 === 0 ? "#ffd43b" : "#00c2b3";
+    p.style.zIndex = "9999";
+    p.style.pointerEvents = "none";
+    p.style.opacity = "0.95";
+    p.style.transform = `rotate(${Math.random()*360}deg)`;
+    p.style.transition = "transform 1.5s ease-out, top 1.5s ease-out, opacity 1.5s ease-out";
+    document.body.appendChild(p);
+    requestAnimationFrame(() => {
+      p.style.top = "105vh";
+      p.style.transform = `translateX(${(Math.random()-0.5)*160}px) rotate(${Math.random()*720}deg)`;
+      p.style.opacity = "0.08";
     });
-  }
-
-  if (readQBtn) {
-    readQBtn.addEventListener("click", () => {
-      speakQuestion(getPlainQuestionText());
-    });
-  }
-
-  if (recordBtn) {
-    recordBtn.addEventListener("click", onRecord);
-  }
-
-  if (submitBtn) {
-    submitBtn.addEventListener("click", onSubmit);
+    setTimeout(() => p.remove(), 1600);
   }
 }
 
-function questionFileForLanguage(lang) {
-  if (lang === "fr") return "questions-fr.json";
-  if (lang === "de") return "questions-de.json";
-  return "questions.json";
-}
+function renderHome(){
+  const grid = document.getElementById("grid");
+  const clearedCount = document.getElementById("clearedCount");
+  if(!grid) return;
+  grid.innerHTML = "";
 
-function speechLangForLanguage(lang) {
-  if (lang === "fr") return "fr-FR";
-  if (lang === "de") return "de-DE";
-  return "es-ES";
-}
+  let cleared = 0;
 
-function fallbackQuestion() {
-  if (state.language === "fr") return "Peux-tu parler un peu de ce thème ?";
-  if (state.language === "de") return "Kannst du ein bisschen über dieses Thema sprechen?";
-  return "¿Puedes hablar un poco de este tema?";
-}
+  LEVELS.forEach((lvl, index) => {
+    const unlocked = lvl.id <= state.unlocked;
+    const best = getBest(lvl.id);
+    if(best > 0) cleared++;
 
-function setQuestion(text) {
-  const q = text || fallbackQuestion();
-  const eng = englishHelpForCurrentTheme();
-  qEl.innerHTML = `
-    <div style="font-weight:800; line-height:1.4;">${escapeHtml(q)}</div>
-    <div style="margin-top:6px;font-size:0.92rem;opacity:0.75;line-height:1.35;">
-      ${escapeHtml(eng)}
-    </div>
-  `;
-}
-
-function getPlainQuestionText() {
-  const first = qEl.querySelector("div");
-  return first ? first.textContent : qEl.textContent;
-}
-
-function englishHelpForCurrentTheme() {
-  const block = THEME_ENGLISH[state.theme] || THEME_ENGLISH.yo;
-  return block[state.tense] || block.present || "Say something about this topic.";
-}
-
-async function loadBank() {
-  if (state.bank) return state.bank;
-  try {
-    const file = questionFileForLanguage(state.language);
-    state.bank = await fetch(file, { cache: "no-store" }).then(r => r.json());
-  } catch {
-    state.bank = {};
-  }
-  return state.bank;
-}
-
-function normaliseTheme(theme) {
-  const t = String(theme || "yo").trim().toLowerCase();
-  if (state.bank && state.bank[t]) return t;
-  return "yo";
-}
-
-function normaliseTense(tense) {
-  const t = String(tense || "present").trim().toLowerCase();
-  return ["present", "past", "future"].includes(t) ? t : "present";
-}
-
-function getQuestionList(theme, tense) {
-  const bank = state.bank || {};
-  const safeTheme = normaliseTheme(theme);
-  const safeTense = normaliseTense(tense);
-  const themeBlock = bank[safeTheme];
-
-  if (!themeBlock) return [];
-
-  if (Array.isArray(themeBlock)) {
-    return themeBlock.filter(Boolean);
-  }
-
-  const exact = themeBlock[safeTense];
-  if (Array.isArray(exact) && exact.length) {
-    return exact.filter(Boolean);
-  }
-
-  const merged = []
-    .concat(Array.isArray(themeBlock.present) ? themeBlock.present : [])
-    .concat(Array.isArray(themeBlock.past) ? themeBlock.past : [])
-    .concat(Array.isArray(themeBlock.future) ? themeBlock.future : [])
-    .filter(Boolean);
-
-  return merged;
-}
-
-function getAnyQuestionFromBank() {
-  const bank = state.bank || {};
-  for (const themeKey of Object.keys(bank)) {
-    const block = bank[themeKey];
-
-    if (Array.isArray(block) && block.length) {
-      return block[Math.floor(Math.random() * block.length)];
+    const btn = document.createElement("button");
+    btn.className = "tile " + (unlocked ? "unlocked" : "locked");
+    btn.innerHTML = `
+      <div class="tileTop">
+        <div class="tileIcon">${lvl.icon}</div>
+        <div>
+          <div class="tileTitle">${lvl.title}</div>
+          <div class="tileMeta">${lvl.subtitle}</div>
+          <div class="tileMeta">Best time: <strong>${formatTime(best)}</strong></div>
+        </div>
+      </div>
+      <div class="tileCTA">${unlocked ? "Start level →" : "Locked"}</div>
+    `;
+    if(unlocked){
+      btn.onclick = () => {
+        localStorage.setItem("turbooooooo_current_level", String(lvl.id));
+        location.href = "play.html";
+      };
     }
+    grid.appendChild(btn);
+  });
 
-    if (block && typeof block === "object") {
-      for (const tenseKey of ["present", "past", "future"]) {
-        const list = block[tenseKey];
-        if (Array.isArray(list) && list.length) {
-          return list[Math.floor(Math.random() * list.length)];
+  if(clearedCount) clearedCount.textContent = String(cleared);
+  const resetBtn = document.getElementById("reset");
+  if(resetBtn){
+    resetBtn.onclick = () => {
+      if(!confirm("Reset all level times and locks?")) return;
+      Object.keys(localStorage).forEach(k => {
+        if(k.startsWith("turbooooooo_past_") || k === "turbooooooo_current_level"){
+          localStorage.removeItem(k);
         }
-      }
-    }
-  }
-  return fallbackQuestion();
-}
-
-function getRandomQuestion(theme, tense) {
-  const list = getQuestionList(theme, tense);
-  if (list.length) {
-    return list[Math.floor(Math.random() * list.length)];
-  }
-  return getAnyQuestionFromBank();
-}
-
-function speakQuestion(text) {
-  if (!text) return;
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = speechLangForLanguage(state.language);
-  u.rate = 0.95;
-  const voices = speechSynthesis.getVoices ? speechSynthesis.getVoices() : [];
-  const want = u.lang.toLowerCase();
-  const v =
-    voices.find(x => (x.lang || "").toLowerCase() === want) ||
-    voices.find(x => (x.lang || "").toLowerCase().startsWith(want.slice(0, 2)));
-  if (v) u.voice = v;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
-}
-
-let mediaRecorder = null;
-let audioChunks = [];
-let recordTimeout = null;
-const MAX_RECORDING_MS = 9000;
-const MIN_RECORDING_MS = 2200;
-const SILENCE_GRACE_MS = 1600;
-
-async function onRecord() {
-  if (!recordBtn || !out) return;
-
-  if (state.lastAudioUrl) {
-    URL.revokeObjectURL(state.lastAudioUrl);
-    state.lastAudioUrl = null;
-  }
-
-  out.classList.remove("hidden");
-  out.innerHTML = `
-    <div><strong>Dictation</strong></div>
-    <div class="tiny">Recording… speak naturally. You can pause briefly to think. (Stops automatically.)</div>
-  `;
-
-  audioChunks = [];
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(stream);
-
-    mediaRecorder.ondataavailable = (e) => {
-      if (e.data && e.data.size) audioChunks.push(e.data);
-    };
-
-    mediaRecorder.onstop = async () => {
-      try {
-        stream.getTracks().forEach(t => t.stop());
-      } catch {}
-
-      const blob = new Blob(audioChunks, {
-        type: (audioChunks[0] && audioChunks[0].type) ? audioChunks[0].type : "audio/webm"
       });
-
-      state.lastAudioUrl = URL.createObjectURL(blob);
-
-      out.innerHTML = `
-        <div><strong>Dictation</strong></div>
-        <div class="tiny">Transcribing…</div>
-      `;
-
-      try {
-        const data = await window.transcribeAudio(blob, state.language);
-        const text = (data && data.text) ? String(data.text).trim() : "";
-        if (!text) {
-          out.innerHTML = `
-            <div><strong>Dictation</strong></div>
-            <div class="tiny">No speech detected. Try again, closer to the mic.</div>
-          `;
-          return;
-        }
-        aEl.value = text;
-        state.lastSafeValue = aEl.value;
-        out.classList.add("hidden");
-      } catch {
-        out.innerHTML = `
-          <div><strong>Dictation</strong></div>
-          <div class="tiny">Transcription failed. Try again.</div>
-        `;
-      }
+      state.unlocked = 1;
+      renderHome();
     };
-
-    mediaRecorder.start();
-
-    let audioContext = null;
-    let analyser = null;
-    let source = null;
-    let silenceStartedAt = null;
-    let startedAt = Date.now();
-    let rafId = null;
-    const timeData = new Uint8Array(2048);
-
-    try {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      source = audioContext.createMediaStreamSource(stream);
-      analyser = audioContext.createAnalyser();
-      analyser.fftSize = 2048;
-      source.connect(analyser);
-
-      const watchSilence = () => {
-        if (!analyser || !mediaRecorder || mediaRecorder.state === "inactive") return;
-
-        analyser.getByteTimeDomainData(timeData);
-
-        let peak = 0;
-        for (let i = 0; i < timeData.length; i++) {
-          const level = Math.abs(timeData[i] - 128);
-          if (level > peak) peak = level;
-        }
-
-        const elapsed = Date.now() - startedAt;
-        const isSpeaking = peak > 7;
-
-        if (elapsed < MIN_RECORDING_MS) {
-          silenceStartedAt = null;
-        } else if (isSpeaking) {
-          silenceStartedAt = null;
-        } else if (!silenceStartedAt) {
-          silenceStartedAt = Date.now();
-        } else if (Date.now() - silenceStartedAt >= SILENCE_GRACE_MS) {
-          safeStopRecording();
-          return;
-        }
-
-        if (elapsed >= MAX_RECORDING_MS) {
-          safeStopRecording();
-          return;
-        }
-
-        rafId = requestAnimationFrame(watchSilence);
-      };
-
-      watchSilence();
-
-      mediaRecorder.addEventListener("stop", () => {
-        if (rafId) cancelAnimationFrame(rafId);
-        try { if (source) source.disconnect(); } catch {}
-        try { if (analyser) analyser.disconnect(); } catch {}
-        try { if (audioContext && audioContext.state !== "closed") audioContext.close(); } catch {}
-      }, { once: true });
-    } catch {
-      recordTimeout = setTimeout(() => safeStopRecording(), MAX_RECORDING_MS);
-    }
-
-    recordBtn.textContent = "⏹ Stop";
-    recordBtn.onclick = () => safeStopRecording();
-  } catch {
-    out.innerHTML = `
-      <div><strong>Dictation</strong></div>
-      <div class="tiny">Microphone permission denied or unavailable.</div>
-    `;
   }
 }
 
-function safeStopRecording() {
-  try {
-    if (recordTimeout) clearTimeout(recordTimeout);
-  } catch {}
-  recordTimeout = null;
+function startLevel(){
+  const levelId = Number(localStorage.getItem("turbooooooo_current_level") || 1);
+  state.currentLevel = levelId;
+  const lvl = LEVELS.find(x => x.id === levelId) || LEVELS[0];
+  state.round = shuffle(lvl.prompts).slice(0, 10);
+  state.idx = 0;
+  state.correct = 0;
+  state.startMs = performance.now();
+  state.accepting = true;
 
-  if (mediaRecorder && mediaRecorder.state !== "inactive") {
-    try { mediaRecorder.stop(); } catch {}
-  }
+  document.getElementById("pill").textContent = `${lvl.title} · ${lvl.subtitle}`;
+  updateTimer();
+  state.timerInt = setInterval(updateTimer, 100);
+  renderQuestion();
+  toneStart();
 
-  if (recordBtn) {
-    recordBtn.textContent = "🎙 Dictate";
-    recordBtn.onclick = onRecord;
-  }
-}
-
-function starsFor(score100) {
-  if (score100 >= 85) return 3;
-  if (score100 >= 70) return 2;
-  if (score100 >= 55) return 1;
-  return 0;
-}
-
-function addTotalStars(n) {
-  const cur = Number(localStorage.getItem(TOTAL_STARS_KEY) || 0);
-  localStorage.setItem(TOTAL_STARS_KEY, String(cur + n));
-}
-
-function updateBest(theme, tense, stars) {
-  const key = `oral_best_${theme}_${tense}`;
-  const cur = Number(localStorage.getItem(key) || 0);
-  if (stars > cur) localStorage.setItem(key, String(stars));
-}
-
-async function onSubmit(e) {
-  if (e) e.preventDefault();
-
-  const answer = aEl.value.trim();
-
-  if (!answer) return;
-
-  const validity = validateTargetLanguageAnswer(answer, state.language);
-
-  if (!validity.ok) {
-    out.classList.remove("hidden");
-    out.innerHTML = `
-      <div style="font-weight:900;font-size:1.1rem;margin-bottom:8px;">Target language only</div>
-      <div style="margin-bottom:8px;">${escapeHtml(validity.message)}</div>
-      <div class="tiny">No English, no keyboard smash, and no pasted text.</div>
-    `;
-    return;
-  }
-
-  if (submitBtn) submitBtn.disabled = true;
-  if (recordBtn) recordBtn.disabled = true;
-
-  out.classList.remove("hidden");
-  out.innerHTML = `<div><strong>Thinking…</strong></div><div class="tiny">Checking your answer.</div>`;
-
-  if (!window.classifyAnswer || typeof window.classifyAnswer !== "function") {
-    out.innerHTML = `
-      <div><strong>Error</strong></div>
-      <div class="tiny">The Worker link is not available on this page.</div>
-    `;
-    if (submitBtn) submitBtn.disabled = false;
-    if (recordBtn) recordBtn.disabled = false;
-    return;
-  }
-
-  const payload = {
-    mode: "jc_oral",
-    language: state.language,
-    theme: state.theme,
-    tense: state.tense,
-    question: getPlainQuestionText(),
-    answer,
-    history: state.history,
-    turn: state.turn + 1,
-    max_turns: MAX_TURNS
+  document.getElementById("homeBtn").onclick = () => {
+    location.href = "index.html";
   };
-
-  let result;
-  try {
-    result = await window.classifyAnswer(payload);
-  } catch {
-    result = {
-      score: 0,
-      focus: "communication",
-      feedback: "AI error — try again.",
-      next_question: null,
-      next_tense: state.tense,
-      session_end: false
-    };
-  }
-
-  const score = Number(result.score) || 0;
-  const focus = (result.focus || "communication").toString();
-
-  state.turn += 1;
-  state.scores.push(score);
-  state.focuses.push(focus);
-  state.history.push({ q: getPlainQuestionText(), a: answer, tense: state.tense });
-
-  const outOf10 = Math.max(0, Math.min(10, Math.round(score / 10)));
-  const starCount = starsFor(score);
-  const stars = "⭐".repeat(starCount);
-  const prevScore = state.scores.length > 1 ? state.scores[state.scores.length - 2] : null;
-
-  let progressLine = "";
-  if (prevScore !== null) {
-    if (score > prevScore) progressLine = `<div style="margin-bottom:10px;font-weight:800;">⬆️ Nice improvement.</div>`;
-    else if (score < prevScore) progressLine = `<div style="margin-bottom:10px;font-weight:800;">⚠️ A bit weaker this time — something is lacking.</div>`;
-    else progressLine = `<div style="margin-bottom:10px;font-weight:800;">➡️ Steady. One small upgrade now.</div>`;
-  }
-
-  let coachLine = "";
-  if (outOf10 >= 8) {
-    coachLine = "Strong answer. Don’t waste too much time chasing one extra mark here. Improve another area too.";
-  } else if (outOf10 >= 6) {
-    coachLine = "Good base. One clear fix will move this up.";
-  } else {
-    coachLine = "Something important is lacking, but it is very fixable.";
-  }
-
-  out.innerHTML = `
-    <div style="font-weight:900;font-size:1.3rem;margin-bottom:6px;">${outOf10}/10 ${stars}</div>
-    ${progressLine}
-    <div style="margin-bottom:10px;"><strong>Main mark-losing issue:</strong> ${escapeHtml(focus)}</div>
-    <div style="margin-bottom:10px;"><strong>Coach note:</strong> ${escapeHtml(coachLine)}</div>
-    <div style="margin-bottom:12px;">${escapeHtml(result.feedback || "—").replace(/\n/g, "<br>")}</div>
-    ${result.model_answer ? `<div style="margin-top:10px;"><strong>Model:</strong><br>${escapeHtml(result.model_answer).replace(/\n/g, "<br>")}</div>` : ""}
-    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
-      <button id="nextBtn" type="button">Next</button>
-      <button id="readFeedbackBtn" class="smallBtn" type="button">🔊 Read Question</button>
-    </div>
-  `;
-
-  setTurn(Math.min(state.turn + 1, MAX_TURNS));
-
-  const readFeedbackBtn = document.getElementById("readFeedbackBtn");
-  if (readFeedbackBtn) {
-    readFeedbackBtn.addEventListener("click", () => speakQuestion(getPlainQuestionText()));
-  }
-
-  const nextBtn = document.getElementById("nextBtn");
-  if (nextBtn) {
-    nextBtn.addEventListener("click", () => {
-      if (result.session_end || state.turn >= MAX_TURNS) {
-        renderSummary(result);
-        return;
-      }
-
-      const nextTense = (result.next_tense || state.tense).toString();
-      state.tense = ["past", "future", "present"].includes(nextTense) ? nextTense : state.tense;
-
-      hidePill();
-
-      if (result.next_question && String(result.next_question).trim()) {
-        setQuestion(String(result.next_question).trim());
-      } else {
-        setQuestion(getRandomQuestion(state.theme, state.tense));
-      }
-
-      aEl.value = "";
-      state.lastSafeValue = "";
-      out.classList.add("hidden");
-      if (submitBtn) submitBtn.disabled = false;
-      if (recordBtn) recordBtn.disabled = false;
-    });
-  }
+  document.getElementById("serBtn").onclick = () => handleAnswer("ser");
+  document.getElementById("estarBtn").onclick = () => handleAnswer("estar");
 }
 
-function renderSummary(result) {
-  const avg = Math.round(state.scores.reduce((a, b) => a + b, 0) / Math.max(1, state.scores.length));
-  const sessionStars = starsFor(avg);
-  addTotalStars(sessionStars);
-  updateBest(state.theme, state.tense, sessionStars);
+function updateTimer(){
+  const sec = (performance.now() - state.startMs) / 1000;
+  const timerEl = document.getElementById("timer");
+  if(timerEl) timerEl.textContent = sec.toFixed(1) + "s";
+}
 
-  const counts = {};
-  state.focuses.forEach(f => {
-    const k = (f || "").trim();
-    if (!k) return;
-    counts[k] = (counts[k] || 0) + 1;
-  });
+function renderQuestion(){
+  const q = state.round[state.idx];
+  document.getElementById("turnNo").textContent = String(state.idx + 1);
+  document.getElementById("question").textContent = q.q;
+  const out = document.getElementById("out");
+  out.classList.add("hidden");
+  out.innerHTML = "";
+}
 
-  let main = "—";
-  let best = 0;
-  Object.keys(counts).forEach(k => {
-    if (counts[k] > best) {
-      best = counts[k];
-      main = k;
-    }
-  });
-
-  const drills = Array.isArray(result?.drills) ? result.drills : [];
-  const avg10 = Math.max(0, Math.min(10, Math.round(avg / 10)));
+function handleAnswer(choice){
+  if(!state.accepting) return;
+  state.accepting = false;
+  const out = document.getElementById("out");
+  const current = state.round[state.idx];
+  const ok = choice === current.a;
 
   out.classList.remove("hidden");
   out.innerHTML = `
-    <h2 style="margin-top:0;">Session Complete</h2>
-    <div style="font-weight:900;font-size:1.8rem;margin:8px 0;">${avg10}/10 ${"⭐".repeat(sessionStars)}</div>
-    <div class="tiny">Turns: ${state.turn}/${MAX_TURNS}</div>
-    <div style="margin-top:12px;"><strong>Your main mark-losing issue today:</strong> ${escapeHtml(main)}</div>
-    <div style="margin-top:10px;"><strong>What to do next:</strong>
-      <ul style="margin:8px 0 0 18px;">
-        ${(drills.length ? drills : [
-          "Add 1 reason or 1 small detail to each answer.",
-          "Use one connector.",
-          "Repeat the same theme and try to beat your last round."
-        ]).map(d => `<li>${escapeHtml(String(d))}</li>`).join("")}
-      </ul>
-    </div>
-    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
-      <button id="againBtn" type="button">Play Again</button>
-      <button id="homeBtn2" class="ghost" type="button">Back to Themes</button>
-    </div>
+    <div class="${ok ? 'feedbackGood' : 'feedbackBad'}">${ok ? "✔ Correct" : "✖ Not this time"}</div>
+    <div style="margin-top:8px;">${current.tip}</div>
   `;
 
-  const againBtn = document.getElementById("againBtn");
-  if (againBtn) {
-    againBtn.addEventListener("click", () => {
-      const keepTheme = state.theme;
-      const keepTense = state.tense;
-      const keepLanguage = state.language;
-      state = {
-        language: keepLanguage,
-        theme: keepTheme,
-        tense: keepTense,
-        turn: 0,
-        history: [],
-        scores: [],
-        focuses: [],
-        lastAudioUrl: null,
-        bank: state.bank,
-        lastSafeValue: ""
-      };
-      hidePill();
-      setTurn(1);
-      aEl.value = "";
-      out.classList.add("hidden");
-      if (submitBtn) submitBtn.disabled = false;
-      if (recordBtn) recordBtn.disabled = false;
-      setQuestion(getRandomQuestion(state.theme, state.tense));
-    });
+  if(ok) {
+    state.correct++;
+    toneGood();
+  } else {
+    toneBad();
   }
 
-  const homeBtn2 = document.getElementById("homeBtn2");
-  if (homeBtn2) {
-    homeBtn2.addEventListener("click", () => {
-      window.location.href = "index.html";
-    });
-  }
-
-  if (submitBtn) submitBtn.disabled = true;
-  if (recordBtn) recordBtn.disabled = false;
-}
-
-function validateTargetLanguageAnswer(answer, lang) {
-  const s = String(answer || "").trim();
-  const lower = s.toLowerCase();
-
-  if (s.length < 3) {
-    return { ok: false, message: "That is too short." };
-  }
-
-  if (!/[a-zA-ZÀ-ÿÄÖÜäöüßñÑçÇ]/.test(s)) {
-    return { ok: false, message: "That does not look like a real answer." };
-  }
-
-  if (looksLikeKeyboardSmash(lower)) {
-    return { ok: false, message: "That looks like keyboard smash, not a real answer." };
-  }
-
-  if (lang === "es" && looksEnglishNotSpanish(lower)) {
-    return { ok: false, message: "Please answer in Spanish only." };
-  }
-
-  if (lang === "fr" && looksEnglishNotFrench(lower)) {
-    return { ok: false, message: "Please answer in French only." };
-  }
-
-  if (lang === "de" && looksEnglishNotGerman(lower)) {
-    return { ok: false, message: "Please answer in German only." };
-  }
-
-  if (lang === "es" && !hasSpanishSignal(lower)) {
-    return { ok: false, message: "That does not look Spanish enough." };
-  }
-
-  if (lang === "fr" && !hasFrenchSignal(lower)) {
-    return { ok: false, message: "That does not look French enough." };
-  }
-
-  if (lang === "de" && !hasGermanSignal(lower)) {
-    return { ok: false, message: "That does not look German enough." };
-  }
-
-  return { ok: true, message: "" };
-}
-
-function looksLikeKeyboardSmash(s) {
-  if (s.length >= 6 && !/[aeiouáéíóúàèìòùâêîôûäëïöüy]/i.test(s)) return true;
-  if (/([a-záéíóúàèìòùâêîôûäëïöüß])\1\1/i.test(s)) return true;
-  if (/^[a-z]{7,}$/i.test(s) && !/\s/.test(s) && !/[aeiouáéíóúàèìòùâêîôûäëïöü]/i.test(s)) return true;
-  return false;
-}
-
-function looksEnglishNotSpanish(s) {
-  const english = /\b(i|my|me|and|the|is|are|live|like|love|have|go|went|with|because|but|in|on|at|family|school|friend|friends)\b/;
-  const spanish = /\b(yo|me|mi|mis|soy|es|son|tengo|vivo|estoy|voy|fui|porque|pero|con|mi familia|mis amigos|instituto|colegio|me gusta|también)\b|[ñáéíóúü]/;
-  return english.test(s) && !spanish.test(s);
-}
-
-function looksEnglishNotFrench(s) {
-  const english = /\b(i|my|me|and|the|is|are|live|like|love|have|go|went|with|because|but|in|on|at|family|school|friend|friends)\b/;
-  const french = /\b(je|j'|moi|mon|ma|mes|suis|ai|habite|vais|parce que|mais|avec|famille|école|amis|j'aime|aussi|dans|c'est)\b|[àâçéèêëîïôùûüÿœ]/;
-  return english.test(s) && !french.test(s);
-}
-
-function looksEnglishNotGerman(s) {
-  const english = /\b(i|my|me|and|the|is|are|live|like|love|have|go|went|with|because|but|in|on|at|family|school|friend|friends)\b/;
-  const german = /\b(ich|mein|meine|bin|habe|wohne|gehe|ging|weil|aber|mit|familie|schule|freunde|mag|auch|und|in der|zu hause)\b|[äöüß]/;
-  return english.test(s) && !german.test(s);
-}
-
-function hasSpanishSignal(s) {
-  return /\b(yo|me|mi|mis|soy|es|son|tengo|vivo|estoy|voy|fui|porque|pero|con|familia|amigos|instituto|colegio|me gusta|también|muy|en|de|un|una)\b|[ñáéíóúü]/.test(s);
-}
-
-function hasFrenchSignal(s) {
-  return /\b(je|j'|moi|mon|ma|mes|suis|ai|habite|vais|parce que|mais|avec|famille|école|amis|j'aime|aussi|très|dans|de|un|une|le|la|les|c'est)\b|[àâçéèêëîïôùûüÿœ]/.test(s);
-}
-
-function hasGermanSignal(s) {
-  return /\b(ich|mein|meine|bin|habe|wohne|gehe|ging|weil|aber|mit|familie|schule|freunde|mag|auch|sehr|und|ein|eine|der|die|das|zu hause)\b|[äöüß]/.test(s);
-}
-
-function lockInputDown(el) {
-  if (!el) return;
-
-  state.lastSafeValue = el.value || "";
-
-  ["paste", "copy", "cut", "drop", "contextmenu"].forEach(evt => {
-    el.addEventListener(evt, e => e.preventDefault());
-  });
-
-  document.addEventListener("copy", e => {
-    if (document.activeElement === el) e.preventDefault();
-  });
-
-  document.addEventListener("cut", e => {
-    if (document.activeElement === el) e.preventDefault();
-  });
-
-  el.addEventListener("beforeinput", e => {
-    const blocked = [
-      "insertFromPaste",
-      "insertFromDrop",
-      "deleteByCut",
-      "historyUndo",
-      "historyRedo"
-    ];
-    if (blocked.includes(e.inputType)) e.preventDefault();
-  });
-
-  el.addEventListener("keydown", e => {
-    const key = (e.key || "").toLowerCase();
-    if ((e.ctrlKey || e.metaKey) && ["v", "c", "x", "a"].includes(key)) {
-      e.preventDefault();
+  setTimeout(() => {
+    state.idx++;
+    if(state.idx >= 10){
+      finishLevel();
+    } else {
+      renderQuestion();
+      state.accepting = true;
     }
-  });
-
-  el.addEventListener("input", () => {
-    state.lastSafeValue = el.value;
-  });
-
-  el.addEventListener("selectstart", e => e.preventDefault());
+  }, 650);
 }
 
-function escapeHtml(s) {
-  return String(s)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+function finishLevel(){
+  clearInterval(state.timerInt);
+  state.timerInt = null;
+  const elapsed = (performance.now() - state.startMs) / 1000;
+  const lvl = LEVELS.find(x => x.id === state.currentLevel) || LEVELS[0];
+  const oldBest = getBest(lvl.id);
+  let best = oldBest;
+
+  if(oldBest === 0 || elapsed < oldBest){
+    setBest(lvl.id, elapsed);
+    best = elapsed;
+  }
+
+  let unlockedNew = false;
+  if(state.correct === 10 && state.unlocked === lvl.id && lvl.id < LEVELS.length){
+    state.unlocked++;
+    localStorage.setItem(STORAGE_UNLOCKED, String(state.unlocked));
+    unlockedNew = true;
+  }
+
+  const out = document.getElementById("out");
+  out.classList.remove("hidden");
+  out.innerHTML = `
+    <div style="font-weight:900;font-size:1.25rem;margin-bottom:8px;">
+      ${oldBest === 0 || elapsed < oldBest ? "New High Score!" : (state.correct === 10 ? "Level Cleared!" : "Round Complete")}
+    </div>
+    <div style="margin-bottom:8px;"><strong>${lvl.title}</strong> • ${lvl.subtitle}</div>
+    <div style="margin-bottom:8px;">Score: <strong>${state.correct}/10</strong></div>
+    <div style="margin-bottom:8px;">Time: <strong>${elapsed.toFixed(1)}s</strong></div>
+    <div style="margin-bottom:14px;">Best time: <strong>${best.toFixed(1)}s</strong></div>
+    <div class="controls" style="justify-content:center;">
+      <button id="againBtn" type="button">Play Again</button>
+      <button id="levelsBtn" class="ghost" type="button">Back to Levels</button>
+    </div>
+    <div class="tiny">${unlockedNew ? "Next level unlocked." : "Best time is stored on the level tile."}</div>
+  `;
+  toneWin();
+  if(state.correct === 10 || oldBest === 0 || elapsed < oldBest) launchConfetti();
+
+  document.getElementById("againBtn").onclick = startLevel;
+  document.getElementById("levelsBtn").onclick = () => location.href = "index.html";
 }
+
+if(isHome) renderHome();
+if(isPlay) startLevel();
