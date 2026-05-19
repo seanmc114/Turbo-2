@@ -361,6 +361,7 @@ function finishLevel(){
   if(oldBest === 0 || elapsed < oldBest){
     setBest(lvl.id, elapsed);
     best = elapsed;
+    showArcadeCode('turbo2', elapsed);
   }
 
   let unlockedNew = false;
